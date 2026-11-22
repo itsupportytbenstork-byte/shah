@@ -9,6 +9,7 @@ app.use(express.json({ limit: '15mb' }));
 // CORS: allowed frontends (testing)
 const ORIGINS = [
   'https://shah-jackets.netlify.app',
+  'https://gg-shah-admin.netlify.app',
   'https://shah-mdq2jc138-sh-ah-jac-kets.vercel.app'
 ];
 app.use((q, s, n) => {

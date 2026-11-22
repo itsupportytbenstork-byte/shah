@@ -6,6 +6,22 @@ const { Resend } = require('resend');
 const app = express();
 app.use(express.json({ limit: '15mb' }));
 
+// CORS: allowed frontends (testing)
+const ORIGINS = [
+  'https://shah-jackets.netlify.app',
+  'https://shah-mdq2jc138-sh-ah-jac-kets.vercel.app'
+];
+app.use((q, s, n) => {
+  if (ORIGINS.includes(q.headers.origin)) {
+    s.set('Access-Control-Allow-Origin', q.headers.origin);
+    s.set('Vary', 'Origin');
+    s.set('Access-Control-Allow-Headers', 'Content-Type, x-admin');
+    s.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  }
+  if (q.method === 'OPTIONS') return s.sendStatus(204);
+  n();
+});
+
 const SRC = path.join(__dirname, 'data.json');
 const DB = process.env.VERCEL ? '/tmp/data.json' : SRC;
 

@@ -1,0 +1,18 @@
+{
+  "products": [],
+  "orders": [],
+  "chats": {},
+  "refunds": [],
+  "discounts": [],
+  "settings": {
+    "banner": "FREE SHIPPING ON ALL ORDERS | 7-DAY HASSLE-FREE RETURNS",
+    "saleActive": false,
+    "salePercent": 0,
+    "saleLabel": "Sale",
+    "specialBtn": { "on": false, "text": "", "code": "" },
+    "slides": [],
+    "tiles": [],
+    "reviews": [],
+    "footer": { "about": "", "email": "", "whatsapp": "" }
+  }
+}

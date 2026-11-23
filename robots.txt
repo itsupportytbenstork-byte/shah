@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /index.html
+Allow: /
+Disallow: /admin.html
+Disallow: /backend.js
+Disallow: /data.json
+Disallow: /api/

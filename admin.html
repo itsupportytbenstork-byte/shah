@@ -1,94 +1,808 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Shah Jackets · Shop Manager</title>
-<style>*{box-sizing:border-box;margin:0}body{font:14px/1.5 system-ui;background:#F7F7F7;color:#141414}
-#sh{display:grid;grid-template-columns:210px 1fr;min-height:100vh}@media(max-width:760px){#sh{grid-template-columns:1fr}}
-aside{background:#fff;border-right:1px solid #e4e1dc;padding:18px 10px}aside h1{font:700 17px Georgia,serif;letter-spacing:.12em;padding:0 10px 4px}aside small{padding:0 10px;color:#777;display:block;margin-bottom:14px}
-aside a{display:flex;justify-content:space-between;padding:9px 10px;border-radius:8px;cursor:pointer;margin:2px 0}aside a:hover{background:#f3ede6}aside a.on{background:#B87333;color:#fff}aside i{background:#a22;color:#fff;border-radius:9px;padding:0 7px;font-style:normal;font-size:11px}
-main{padding:22px;max-width:1050px;width:100%}h2{font:600 22px Georgia,serif;margin-bottom:14px}h3{margin-bottom:8px}
-.c{background:#fff;border:1px solid #e4e1dc;border-radius:8px;padding:16px;margin:12px 0}.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.st .c{margin:0}.st b{font-size:24px;display:block}.st span{color:#666}
-input,select,textarea{padding:9px;border:1px solid #cfcac3;border-radius:6px;width:100%;margin:4px 0;font:inherit}input[type=checkbox]{width:auto}
-button{cursor:pointer;background:#141414;color:#fff;border:0;padding:9px 16px;border-radius:20px;font:inherit}button.o{background:#fff;color:#141414;border:1px solid #141414}button.r{background:#a22}button.a{background:#B87333}
+<style>
+:root{--ink:#141414;--bg:#F7F7F7;--ln:#e4e1dc;--ac:#B87333;--red:#a22;--green:#2a7e3b;--warn:#d9822b}
+*{box-sizing:border-box;margin:0}body{font:14px/1.5 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink)}
+#sh{display:grid;grid-template-columns:230px 1fr;min-height:100vh}@media(max-width:800px){#sh{grid-template-columns:1fr}}
+aside{background:#fff;border-right:1px solid var(--ln);padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+aside h1{font:700 18px Georgia,serif;letter-spacing:.14em;padding:0 8px 2px}aside small{padding:0 8px;color:#777;font-size:11px;display:block;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
+aside a{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:8px;cursor:pointer;color:#333;font-weight:500;text-decoration:none}
+aside a:hover{background:#f3ede6;color:var(--ink)}aside a.on{background:var(--ac);color:#fff}
+aside i{background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-style:normal;font-size:11px;font-weight:700}
+aside .sep{height:1px;background:var(--ln);margin:10px 0}
+main{padding:26px 32px;max-width:1200px;width:100%}@media(max-width:700px){main{padding:16px}}
+h2{font:600 24px Georgia,serif;margin-bottom:16px}h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.c{background:#fff;border:1px solid var(--ln);border-radius:10px;padding:18px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px}.st .c{margin:0;padding:16px}
+.st b{font-size:26px;display:block;line-height:1.2;font-weight:700}.st span{color:#666;font-size:13px}
+input,select,textarea{padding:9px 12px;border:1px solid #cfcac3;border-radius:6px;width:100%;margin:4px 0;font:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 2px rgba(184,115,51,.15)}
+input[type=checkbox]{width:auto;margin-right:6px}
+button{cursor:pointer;background:var(--ink);color:#fff;border:0;padding:9px 16px;border-radius:20px;font:inherit;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+button:hover{opacity:.9}button.o{background:#fff;color:var(--ink);border:1px solid #cfcac3}button.o:hover{background:#fafafa;border-color:#999}
+button.r{background:var(--red)}button.a{background:var(--ac)}button:disabled{opacity:.4;cursor:default}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.g{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse}td,th{padding:9px 6px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}th{color:#666;font-weight:500}
-.im{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.im img{width:76px;height:96px;object-fit:cover;border-radius:6px}.ch{display:inline-block;background:#eee;padding:3px 10px;margin:2px;border-radius:14px}
-.pill{padding:2px 10px;border-radius:12px;background:#eee;font-size:12px}.pill.ok{background:#dff3e3}.pill.w{background:#fff0d6}
-.chat{display:grid;grid-template-columns:240px 1fr;gap:12px}@media(max-width:760px){.chat{grid-template-columns:1fr}}.cl a{display:block;padding:10px;border-bottom:1px solid #eee;cursor:pointer}.cl a.on{background:#f3ede6}
-.m{padding:7px 11px;margin:4px 0;max-width:78%;border-radius:12px;background:#eee}.m.owner{background:#B87333;color:#fff;margin-left:auto}#msgs{height:340px;overflow:auto}.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}.hd h2{margin:0}.hd small,h3 small{color:#888;font:400 12px system-ui;margin-left:6px}
-.tb{display:flex;gap:10px;flex-wrap:wrap}.tb input{flex:1;min-width:160px}.tb select{width:auto}
-.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:12px}
-.pc{background:#fff;border:1px solid #e4e1dc;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}.pi{position:relative;aspect-ratio:3/4;background:#eee}.pi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s}.pi img.b{opacity:0}.pc:hover .pi img.b{opacity:1}.pt .cvb{width:100%;margin-top:4px;background:#f3ede6;color:#8a5522;font-size:11px;padding:3px 0}.pc .bd{padding:10px 12px;flex:1}.pc .bd b{display:block}.pc .pr{color:#B87333;font-weight:600}.tg{margin:6px 0}.tg i{font-style:normal;background:#f3ede6;border-radius:10px;padding:1px 8px;font-size:11px;margin:0 4px 4px 0;display:inline-block}.pc .ac{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap}.pc .ac button{padding:6px 12px;font-size:13px}
-.emp{grid-column:1/-1;text-align:center;padding:40px}
-.eg{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;align-items:start}@media(max-width:860px){.eg{grid-template-columns:1fr}}.eg .c{margin:0 0 14px}
-.dz{display:block;border:2px dashed #cfcac3;border-radius:10px;padding:22px;text-align:center;cursor:pointer;color:#555;background:#fcfbf9}.dz.dr,.dz:hover{border-color:#B87333;background:#fbf3ea}.dz span{font-size:12px;color:#888}
-.pts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.pt{position:relative;width:96px}.pt img{width:96px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #e4e1dc;display:block}.pt.cv img{border:2px solid #B87333}.pt em{position:absolute;left:4px;top:4px;background:#B87333;color:#fff;font-style:normal;font-size:10px;padding:1px 6px;border-radius:8px}.pt div{display:flex;gap:3px;margin-top:4px}.pt button{padding:2px 0;flex:1;border-radius:6px;font-size:11px;background:#eee;color:#141414}.pt button.x{background:#fbe3e3;color:#a22}.pt button:disabled{opacity:.35;cursor:default}.pt.up{display:flex;align-items:center;justify-content:center;height:120px;border:1px dashed #B87333;border-radius:8px;font-size:12px;color:#B87333;text-align:center}
-.chip2{display:inline-flex;align-items:center;gap:6px;border:1px solid #cfcac3;background:#fff;color:#141414;border-radius:16px;padding:5px 12px;margin:3px 4px 3px 0;font-size:13px}.chip2.on{background:#141414;color:#fff;border-color:#141414}.chip2 u{width:12px;height:12px;border-radius:50%;border:1px solid #0003}
-.er{color:#a22;font-size:12px;margin:2px 0}.pvw{max-width:200px}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#141414;color:#fff;padding:10px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:.2s;z-index:99}#toast.on{opacity:1}#toast.bad{background:#a22}
+table{width:100%;border-collapse:collapse}td,th{padding:11px 8px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}th{color:#777;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.pill{padding:3px 10px;border-radius:12px;background:#eee;font-size:11px;font-weight:600;display:inline-block}
+.pill.ok{background:#dcf2e3;color:var(--green)}.pill.w{background:#fdf0d5;color:var(--warn)}.pill.bad{background:#fce6e6;color:var(--red)}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}.hd h2{margin:0}.hd small,h3 small{color:#888;font:400 12px system-ui;margin-left:6px}
+.tb{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.tb input{flex:1;min-width:180px;margin:0}.tb select{width:auto;margin:0}
+.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:14px}
+.pc{background:#fff;border:1px solid var(--ln);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.pi{position:relative;aspect-ratio:3/4;background:#eee}.pi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s}.pi img.b{opacity:0}.pc:hover .pi img.b{opacity:1}
+.pc .bd{padding:12px;flex:1}.pc .bd b{display:block;font-size:15px;margin-bottom:2px}.pc .pr{color:var(--ac);font-weight:700;font-size:15px}
+.tg{margin:6px 0}.tg i{font-style:normal;background:#f3ede6;border-radius:10px;padding:2px 8px;font-size:11px;margin:0 4px 4px 0;display:inline-block}
+.pc .ac{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap}.pc .ac button{padding:6px 12px;font-size:12px}
+.eg{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}@media(max-width:860px){.eg{grid-template-columns:1fr}}.eg .c{margin:0 0 14px}
+.dz{display:block;border:2px dashed #cfcac3;border-radius:10px;padding:24px;text-align:center;cursor:pointer;color:#555;background:#fcfbf9}
+.dz.dr,.dz:hover{border-color:var(--ac);background:#fbf3ea}.dz span{font-size:12px;color:#888}
+.pts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.pt{position:relative;width:104px}
+.pt img{width:104px;height:130px;object-fit:cover;border-radius:8px;border:1px solid var(--ln);display:block}
+.pt.cv img{border:2px solid var(--ac)}.pt.sc img{border:2px solid #3366cc}
+.pt em{position:absolute;left:4px;top:4px;color:#fff;font-style:normal;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:bold}
+.pt.cv em{background:var(--ac)}.pt.sc em{background:#3366cc}
+.pt .tagb{width:100%;margin-top:3px;font-size:11px;padding:3px 0;border-radius:4px;border:1px solid #ddd;background:#fff;color:#333;cursor:pointer}
+.pt .tagb.act{background:#f3ede6;font-weight:bold;color:var(--ac);border-color:var(--ac)}
+.pt div{display:flex;gap:3px;margin-top:3px}.pt button{padding:3px 0;flex:1;border-radius:6px;font-size:11px;background:#eee;color:var(--ink)}.pt button.x{background:#fbe3e3;color:var(--red)}
+.pt.up{display:flex;align-items:center;justify-content:center;height:130px;border:1px dashed var(--ac);border-radius:8px;font-size:12px;color:var(--ac);text-align:center}
+.chip2{display:inline-flex;align-items:center;gap:6px;border:1px solid #cfcac3;background:#fff;color:var(--ink);border-radius:16px;padding:5px 12px;margin:3px 4px 3px 0;font-size:13px;cursor:pointer}
+.chip2.on{background:var(--ink);color:#fff;border-color:var(--ink)}.chip2 u{width:12px;height:12px;border-radius:50%;border:1px solid #0003}
+.chat{display:grid;grid-template-columns:260px 1fr;gap:14px;min-height:500px}@media(max-width:760px){.chat{grid-template-columns:1fr}}
+.cl a{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #eee;cursor:pointer}
+.cl a:hover{background:#fcfbf9}.cl a.on{background:#f3ede6;font-weight:600}
+#msgs{height:380px;overflow:auto;padding:14px;background:#fafafa;border-radius:8px;display:flex;flex-direction:column;gap:8px}
+.m{padding:9px 14px;max-width:75%;border-radius:14px;background:#fff;border:1px solid #e4e1dc;font-size:13px;line-height:1.4}
+.m.customer{margin-right:auto;border-bottom-left-radius:3px}
+.m.owner{background:var(--ac);color:#fff;border-color:var(--ac);margin-left:auto;border-bottom-right-radius:3px}
+.m small{display:block;font-size:10px;opacity:.7;margin-top:4px}
+.er{color:var(--red);font-size:12px;margin:2px 0}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:24px;opacity:0;pointer-events:none;transition:.2s;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+#toast.on{opacity:1}#toast.bad{background:var(--red)}
+.emp{text-align:center;padding:50px 20px;color:#777}
 </style></head><body><div id="app"></div>
 <script>
-const API='https://shah-2woyw18v6-sh-ah-jac-kets.vercel.app';
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let T=sessionStorage.t||'',D={products:[],orders:[],refunds:[],chats:{},discounts:[],settings:{}},tab='home',ed=null,imgs=[],thumbs=[],cols=[],sid=null,busy=0;
-async function api(u,m='GET',b){const r=await fetch(API+u,{method:m,headers:{'Content-Type':'application/json','x-admin':T},body:b?JSON.stringify(b):undefined});if(r.status==401&&T){sessionStorage.t='';T='';login();throw 0}return r.json()}
-function login(msg){$('#app').innerHTML=`<div class="c" style="max-width:340px;margin:12vh auto"><h2>Shop Manager</h2><p style="color:#a22">${msg||''}</p><input id="pw" type="password" placeholder="Master password" onkeydown="if(event.key=='Enter')go()"><button class="a" onclick="go()">Sign in</button></div>`}
-async function go(){const p=$('#pw').value,r=await fetch(API+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})});if(r.ok){T=p;sessionStorage.t=p;refresh()}else login('Wrong password.')}
-async function refresh(){D=await api('/api/admin/data');draw()}
-const un=()=>Object.values(D.chats).filter(c=>c.unread).length,openR=()=>D.refunds.filter(r=>r.status=='Requested').length;
-function draw(){const N=[['home','Overview'],['list','Listings'],['orders','Orders',D.orders.filter(o=>o.status=='Pending').length],['chat','Messages',un()],['refunds','Refunds',openR()],['mkt','Sales & Discounts']];
-$('#app').innerHTML=`<div id="sh"><aside><h1>SHAH JACKETS</h1><small>Shop Manager</small>${N.map(([k,v,n])=>`<a class="${tab==k?'on':''}" onclick="tab='${k}';ed=null;draw()">${v}${n?`<i>${n}</i>`:''}</a>`).join('')}<a onclick="refresh()">↻ Refresh</a><a onclick="sessionStorage.t='';location.reload()">Sign out</a></aside><main>${D.persistent===false?'<div class="c" style="border-color:#a22;color:#a22"><b>Warning:</b> no database is connected, so listings, orders and chats will be lost. Set FIREBASE_DB_URL on the server.</div>':''}${V[tab]()}</main></div>`}
-const V={home(){const live=D.orders.filter(o=>o.status!='Cancelled'),rev=live.reduce((a,o)=>a+o.total,0);return`<h2>Welcome back</h2><div class="st"><div class="c"><b>$${rev.toFixed(2)}</b><span>Revenue</span></div><div class="c"><b>${D.orders.length}</b><span>Orders</span></div><div class="c"><b>${D.orders.filter(o=>['Pending','Confirmed'].includes(o.status)).length}</b><span>To ship</span></div><div class="c"><b>${D.products.length}</b><span>Active listings</span></div><div class="c"><b>${un()}</b><span>Unread messages</span></div><div class="c"><b>${openR()}</b><span>Open refunds</span></div></div><div class="c"><h3>Abandoned carts: ${Object.values(D.carts||{}).filter(c=>!c.reminded).length}</h3><p style="color:#666;margin-bottom:8px">Customers who verified their email and left items in the cart. Reminders go out automatically once a day, 1 hour or more after they left.</p><button class="a" onclick="api('/api/admin/reminders','POST',{}).then(r=>{toast(r.sent+' reminder email(s) sent');refresh()})">Send reminders now</button></div><div class="c"><h3>Recent orders</h3>${D.orders.slice(0,5).map(o=>`<p>${o.id} · ${esc(o.address.name)} · $${o.total} · <span class="pill w">${o.status}</span></p>`).join('')||'<p>No orders yet.</p>'}</div>`},
-list(){if(ed)return editor();return`<div class="hd"><h2>Listings <small>${D.products.length}</small></h2><button class="a" onclick="ed=newP();rd()">+ Add a listing</button></div><div class="tb"><input placeholder="Search listings" value="${esc(ls)}" oninput="ls=this.value;lg()"><select onchange="lcat=this.value;lg()"><option value="">All categories</option>${Object.entries(CL).map(([k,v])=>`<option value="${k}" ${lcat==k?'selected':''}>${v}</option>`).join('')}</select></div><div id="lg" class="lg">${lgH()}</div>`},
-orders(){return`<h2>Orders</h2>`+(D.orders.map(o=>`<div class="c"><b>${o.id}</b> · ${new Date(o.date).toLocaleString()} · <b>$${o.total}</b> ${o.code?`(code ${o.code})`:''} · ${o.gateway}${o.paid?' · <span class="pill ok">paid</span>':''}<br>${o.items.map(i=>`${esc(i.title)} (${i.size}, ${esc(i.color)}) ×${i.qty}`).join('<br>')}<p style="margin:8px 0;color:#444"><b>Ship to:</b> ${esc(o.address.name)}, ${esc(o.address.street)} ${esc(o.address.apt)}, ${esc(o.address.city)}, ${esc(o.address.state)} ${esc(o.address.zip)}, ${esc(o.address.country)}<br>${esc(o.address.email)} · ${esc(o.address.phone)}</p><select style="width:auto" onchange="api('/api/admin/order/${o.id}','POST',{status:this.value}).then(refresh)">${['Pending','Confirmed','Shipped','Delivered','Cancelled'].map(s=>`<option ${o.status==s?'selected':''}>${s}</option>`).join('')}</select> <button class="o" onclick="api('/api/admin/order/${o.id}','POST',{status:'${o.status}',paid:${!o.paid}}).then(refresh)">Mark ${o.paid?'unpaid':'paid'}</button></div>`).join('')||'<div class="c">No orders yet.</div>')},
-chat(){const k=Object.keys(D.chats).reverse(),c=D.chats[sid];return`<h2>Messages</h2><div class="chat"><div class="c cl" style="margin:0;padding:0">${k.map(s=>`<a class="${s==sid?'on':''}" onclick="sid='${s}';api('/api/admin/chat/${s}','POST',{}).then(refresh)">${esc(D.chats[s].name)} ${D.chats[s].unread?'<i style="background:#a22;color:#fff;border-radius:9px;padding:0 7px;font-style:normal">new</i>':''}</a>`).join('')||'<p style="padding:12px">No messages yet.</p>'}</div><div class="c" style="margin:0">${c?`<div id="msgs">${c.messages.map(m=>`<div class="m ${m.from}">${esc(m.text)}</div>`).join('')}</div><div class="g" style="grid-template-columns:1fr auto"><input id="rp" placeholder="Reply" onkeydown="if(event.key=='Enter')rp()"><button class="a" onclick="rp()">Send</button></div>`:'Select a conversation.'}</div></div>`},
-refunds(){return`<h2>Refund requests</h2>`+(D.refunds.map(r=>`<div class="c"><b>${r.id}</b> · Order ${r.orderId} · ${esc(r.email)} · <span class="pill w">${r.status}</span><p style="margin:6px 0">${esc(r.reason)}</p><button class="a" onclick="rs('${r.id}','Approved')">Approve</button> <button class="r" onclick="rs('${r.id}','Declined')">Decline</button> <button class="o" onclick="rs('${r.id}','Refunded')">Mark refunded</button></div>`).join('')||'<div class="c">No refund requests.</div>')},
-mkt(){const s=D.settings,b=s.specialBtn||{};return`<h2>Sales & Discounts</h2><div class="c"><h3>Sitewide sale</h3><label><input type="checkbox" id="sa" ${s.saleActive?'checked':''}> Sale is on</label><div class="g"><input id="sp" type="number" min="0" max="90" placeholder="Percent off" value="${s.salePercent||''}"><input id="sl" placeholder="Badge label (e.g. Winter Sale)" value="${esc(s.saleLabel||'')}"></div></div>
-<div class="c"><h3>Top announcement bar</h3><input id="bn" value="${esc(s.banner||'')}"></div>
-<div class="c"><h3>Special discount button (shown on the homepage banner)</h3><label><input type="checkbox" id="bo" ${b.on?'checked':''}> Show button</label><div class="g"><input id="bt" placeholder="Button text (e.g. Get 15% off today)" value="${esc(b.text||'')}"><select id="bc"><option value="">Choose a promo code</option>${D.discounts.map(d=>`<option ${b.code==d.code?'selected':''}>${d.code}</option>`).join('')}</select></div></div>
-<button class="a" onclick="sset()">Save sale settings</button>
-<div class="c"><h3>Promo codes</h3><div class="g" style="grid-template-columns:1fr 1fr auto"><input id="dc" placeholder="CODE"><input id="dp" type="number" placeholder="% off"><button class="a" onclick="sdc()">Add code</button></div><table>${D.discounts.map(d=>`<tr><td><b>${d.code}</b></td><td>${d.pct}% off</td><td><span class="pill ${d.active?'ok':''}">${d.active?'Active':'Paused'}</span></td><td><button class="o" onclick="api('/api/admin/discount','POST',{...${JSON.stringify(d)},active:${!d.active}}).then(refresh)">${d.active?'Pause':'Resume'}</button> <button class="r" onclick="api('/api/admin/discount/${d.code}','DELETE').then(refresh)">Delete</button></td></tr>`).join('')}</table></div>`}};
-async function sset(){await api('/api/admin/settings','POST',{saleActive:$('#sa').checked,salePercent:+$('#sp').value||0,saleLabel:$('#sl').value,banner:$('#bn').value,specialBtn:{on:$('#bo').checked,text:$('#bt').value,code:$('#bc').value}});await refresh();alert('Saved')}
-async function sdc(){await api('/api/admin/discount','POST',{code:$('#dc').value,pct:$('#dp').value});refresh()}
-async function rp(){const v=$('#rp').value.trim();if(v){await api('/api/admin/chat/'+sid,'POST',{text:v});await refresh();const m=$('#msgs');m&&(m.scrollTop=1e6)}}
-const rs=(id,s)=>api('/api/admin/refund/'+id,'POST',{status:s}).then(refresh);
-const CL={leather:'Leather / Biker',wool:'Wool / Tailored',street:'Streetwear / Bomber'},SZ=['XS','S','M','L','XL','XXL'],PC={Black:'#111',Brown:'#6b4226',Tan:'#c19a6b',Camel:'#b98a4f',Navy:'#1f2a44',Grey:'#888',Olive:'#6b6b3a',Burgundy:'#6d1a2a',White:'#f2f2f2'};
-let ls='',lcat='',upl='';
-const rd=()=>{const y=scrollY;draw();scrollTo(0,y)};
-function toast(m,bad){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.textContent=m;t.className='on'+(bad?' bad':'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='',3200)}
-const newP=()=>({title:'',desc:'',price:'',cat:'leather',season:'All-Season',sizes:['S','M','L','XL'],custom:true,colors:[],images:[],thumbs:[]});
-function lgH(){const q=ls.toLowerCase(),L=D.products.filter(p=>(!lcat||p.cat==lcat)&&(!q||(p.title+' '+(p.desc||'')).toLowerCase().includes(q)));
- if(!L.length)return`<div class="c emp">${D.products.length?'No listings match your search.':'No listings yet. Add your first jacket.'}</div>`;
- return L.map(p=>`<div class="pc"><div class="pi"><img src="${esc((p.thumbs||[])[0]||(p.images||[])[0]||'')}" alt="">${(p.thumbs||p.images||[])[1]?`<img class="b" src="${esc((p.thumbs||p.images)[1])}" alt="">`:''}</div><div class="bd"><b>${esc(p.title)}</b><span class="pr">$${(+p.price).toFixed(2)}</span><div class="tg"><i>${CL[p.cat]||p.cat}</i><i>${esc(p.season)}</i><i>${(p.images||[]).length} photo${(p.images||[]).length==1?'':'s'}</i>${(p.sizes||[]).length?`<i>${p.sizes.join(' ')}</i>`:''}${p.custom?'<i>Custom size</i>':''}</div>${(p.colors||[]).length?`<small style="color:#666">${p.colors.map(esc).join(', ')}</small>`:''}</div><div class="ac"><button class="o" onclick="edit('${p.id}')">Edit</button><button class="o" onclick="dup('${p.id}')">Duplicate</button><button class="r" onclick="del('${p.id}')">Delete</button></div></div>`).join('')}
-const lg=()=>{const e=$('#lg');if(e)e.innerHTML=lgH()};
-function phH(){const p=ed;return`<h3>Photos <small>${p.images.length}/10 · first photo is the cover</small></h3><label class="dz" ondragover="event.preventDefault();this.classList.add('dr')" ondragleave="this.classList.remove('dr')" ondrop="event.preventDefault();this.classList.remove('dr');ph(event.dataTransfer.files)"><input type="file" accept="image/*" multiple hidden onchange="ph(this.files);this.value=''"><b>Click to add photos</b> or drag them here<br><span>JPG or PNG, up to 10 photos</span></label><div class="pts">${p.images.map((u,i)=>`<div class="pt${i?'':' cv'}"><img src="${esc(p.thumbs[i]||u)}" alt="">${i?'':'<em>Cover</em>'}${i?`<button class="cvb" onclick="cover(${i})">★ Make cover</button>`:''}<div><button title="Move left" onclick="mv(${i},-1)" ${i?'':'disabled'}>◀</button><button title="Move right" onclick="mv(${i},1)" ${i<p.images.length-1?'':'disabled'}>▶</button><button class="x" title="Remove" onclick="rmI(${i})">✕</button></div></div>`).join('')}${upl?`<div class="pt up">Uploading<br>${upl}</div>`:''}</div><p class="er" id="e_img"></p>`}
-const phr=()=>{const e=$('#phs');if(e)e.innerHTML=phH();pv()};
-function pv(){const p=ed;if(!p||!$('#pvt'))return;$('#pvt').textContent=p.title||'Jacket title';$('#pvp').textContent=p.price>0?'$'+(+p.price).toFixed(2):'$0.00';const i=$('#pvi');if(i)i.src=p.thumbs[0]||p.images[0]||'';const j=$('#pv2');if(j){j.style.display=p.images[1]?'':'none';j.src=p.thumbs[1]||p.images[1]||''}}
-function fld(k,v){ed[k]=v;ed._d=1;pv()}
-function tg(k,v){const a=ed[k],i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);ed._d=1;rd()}
-function addc(){const i=$('#cc'),v=i.value.trim();if(v&&!ed.colors.some(c=>c.toLowerCase()==v.toLowerCase())){ed.colors.push(v);ed._d=1}rd()}
-function mv(i,d){const j=i+d,p=ed;if(j<0||j>=p.images.length)return;[p.images[i],p.images[j]]=[p.images[j],p.images[i]];[p.thumbs[i],p.thumbs[j]]=[p.thumbs[j],p.thumbs[i]];p.thumbs=p.thumbs;ed._d=1;phr()}
-function cover(i){const p=ed;p.images.unshift(p.images.splice(i,1)[0]);p.thumbs.unshift(p.thumbs.splice(i,1)[0]);ed._d=1;phr();toast('Cover photo changed')}
-function rmI(i){ed.images.splice(i,1);ed.thumbs.splice(i,1);ed._d=1;phr()}
-function cancel(){if(ed._d&&!confirm('Discard unsaved changes?'))return;ed=null;rd()}
-function editor(){const p=ed,cs=[...Object.keys(PC),...p.colors.filter(c=>!PC[c])];return`<div class="hd"><h2>${p.id?'Edit listing':'New listing'}</h2><div><button class="o" onclick="cancel()">Cancel</button> <button class="a" id="sv" onclick="saveP()">${p.id?'Save changes':'Publish listing'}</button></div></div>
-<div class="eg"><div><div class="c" id="phs">${phH()}</div>
-<div class="c"><h3>Title</h3><input id="ti" maxlength="80" value="${esc(p.title)}" placeholder="e.g. Classic Black Leather Biker Jacket" oninput="fld('title',this.value)"><p class="er" id="e_ti"></p><h3>Description</h3><textarea rows="7" placeholder="Material, fit notes, care" oninput="fld('desc',this.value)">${esc(p.desc)}</textarea></div></div>
-<div><div class="c"><h3>Price (USD)</h3><input type="number" step="0.01" min="0" value="${esc(p.price)}" oninput="fld('price',this.value)"><p class="er" id="e_pr"></p><h3>Category</h3><select onchange="fld('cat',this.value)">${Object.entries(CL).map(([k,v])=>`<option value="${k}" ${p.cat==k?'selected':''}>${v}</option>`).join('')}</select><h3 style="margin-top:8px">Season</h3><select onchange="fld('season',this.value)">${['All-Season','Winter','Special Season'].map(v=>`<option ${p.season==v?'selected':''}>${v}</option>`).join('')}</select></div>
-<div class="c"><h3>Sizes</h3>${SZ.map(s=>`<button class="chip2 ${p.sizes.includes(s)?'on':''}" onclick="tg('sizes','${s}')">${s}</button>`).join('')}<br><label style="display:block;margin-top:8px"><input type="checkbox" ${p.custom?'checked':''} onchange="fld('custom',this.checked)"> Custom Size (DM to Order)</label><p class="er" id="e_sz"></p></div>
-<div class="c"><h3>Colors</h3>${cs.map(c=>`<button class="chip2 ${p.colors.includes(c)?'on':''}" data-c="${esc(c)}" onclick="tg('colors',this.dataset.c)">${PC[c]?`<u style="background:${PC[c]}"></u>`:''}${esc(c)}</button>`).join('')}<div class="g" style="grid-template-columns:1fr auto;margin-top:6px"><input id="cc" placeholder="Other colour…" onkeydown="if(event.key=='Enter'){addc();event.preventDefault()}"><button class="o" onclick="addc()">Add</button></div></div>
-<div class="c"><h3>Shop preview <small>hover to see the 2nd photo</small></h3><div class="pc pvw"><div class="pi"><img id="pvi" src="${esc(p.thumbs[0]||p.images[0]||'')}" alt=""><img class="b" id="pv2" src="${esc(p.thumbs[1]||p.images[1]||'')}" alt="" ${p.images[1]?'':'style="display:none"'}></div><div class="bd"><b id="pvt">${esc(p.title||'Jacket title')}</b><span class="pr" id="pvp">$${(+p.price||0).toFixed(2)}</span></div></div></div></div></div>`}
-const shrink=(src,m,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',q))};i.src=src});
-async function up(d){const r=await api('/api/admin/image','POST',{data:d});if(!r.url)throw new Error(r.error||'Upload error');return r.url}
-async function ph(fs){const E=ed;fs=[...fs].filter(f=>f.type.startsWith('image/'));const room=10-E.images.length;if(fs.length>room){toast('Maximum 10 photos per listing',1);fs=fs.slice(0,room)}
- let n=0;try{for(const f of fs){upl=`${++n} of ${fs.length}`;if(ed===E)phr();const src=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});const a=await up(await shrink(src,1000,.78)),b=await up(await shrink(src,420,.7));E.images.push(a);E.thumbs.push(b);E._d=1}}catch(e){toast('Upload failed: '+(e.message||e),1)}upl='';if(ed===E)phr()}
-async function saveP(){const p=ed,E={};
- if(!p.images.length)E.img='Add at least one photo.';if(!p.title.trim())E.ti='Title is required.';if(!(+p.price>0))E.pr='Enter a price above 0.';if(!p.sizes.length&&!p.custom)E.sz='Pick at least one size, or allow custom size.';
- ['img','ti','pr','sz'].forEach(k=>{const e=$('#e_'+k);if(e)e.textContent=E[k]||''});
- const first=Object.keys(E)[0];if(first){$('#e_'+first).scrollIntoView({block:'center',behavior:'smooth'});return}
- if(upl)return toast('Wait for photos to finish uploading',1);
- const b=$('#sv');b.disabled=true;b.textContent='Saving…';
- try{const r=await api('/api/admin/product','POST',{id:p.id,title:p.title.trim(),desc:p.desc,price:+(+p.price).toFixed(2),cat:p.cat,season:p.season,sizes:SZ.filter(s=>p.sizes.includes(s)),custom:p.custom,colors:p.colors,images:p.images,thumbs:p.thumbs});if(r.error)throw new Error(r.error);ed=null;await refresh();toast(p.id?'Changes saved':'Listing published')}catch(e){b.disabled=false;b.textContent='Try again';toast('Could not save: '+(e.message||'check your connection'),1)}}
-function edit(id,copy){const p=D.products.find(x=>x.id==id),im=[...(p.images||[])];ed={...p,desc:p.desc||'',sizes:[...(p.sizes||[])],colors:[...(p.colors||[])],images:im,thumbs:im.map((u,i)=>(p.thumbs||[])[i]||u),custom:p.custom!==false};if(copy){delete ed.id;ed.title+=' (copy)';ed._d=1}rd();scrollTo(0,0)}
-const dup=id=>edit(id,1);
-async function del(id){if(confirm('Delete this listing? This cannot be undone.')){try{await api('/api/admin/product/'+id,'DELETE');await refresh();toast('Listing deleted')}catch(e){toast('Could not delete',1)}}}
-setInterval(()=>{if(T&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&tab!='list')refresh()},8000);
-T?refresh():login();
+const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1') ? '' : 'https://shah-8m167m1y9-sh-ah-jac-kets.vercel.app';
+const $ = s => document.querySelector(s), esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let T = sessionStorage.t || '', D = { products:[], orders:[], refunds:[], chats:{}, discounts:[], carts:{}, settings:{} };
+let tab = 'home', ed = null, sid = null, busy = 0, ls = '', lcat = '', ordFlt = '', upl = '';
+
+const CL = { leather:'Leather / Biker', wool:'Wool / Tailored', street:'Streetwear / Bomber' };
+const SZ = ['XS','S','M','L','XL','XXL'];
+const PC = { Black:'#111', Brown:'#6b4226', Tan:'#c19a6b', Camel:'#b98a4f', Navy:'#1f2a44', Grey:'#888', Olive:'#6b6b3a', Burgundy:'#6d1a2a', White:'#f2f2f2' };
+
+async function api(u, m='GET', b){
+  const r = await fetch(API+u, { method:m, headers:{ 'Content-Type':'application/json', 'x-admin':T }, body:b?JSON.stringify(b):undefined });
+  if (r.status===401 && T) { sessionStorage.t=''; T=''; login(); throw 0; }
+  return r.json();
+}
+
+function toast(m, bad){
+  let t = $('#toast'); if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent = m; t.className = 'on' + (bad ? ' bad' : '');
+  clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3200);
+}
+
+function login(msg){
+  $('#app').innerHTML = `
+    <div class="c" style="max-width:360px;margin:15vh auto;padding:26px">
+      <h2 style="margin-bottom:6px">Shop Manager</h2>
+      <p style="color:#777;font-size:13px;margin-bottom:14px">Shah Jackets administrative access</p>
+      ${msg ? `<p style="color:var(--red);font-size:13px;margin-bottom:10px">${msg}</p>` : ''}
+      <input id="pw" type="password" placeholder="Master password" autofocus onkeydown="if(event.key==='Enter')go()">
+      <button class="a" style="width:100%;margin-top:10px" onclick="go()">Sign in</button>
+    </div>`;
+}
+
+async function go(){
+  const p = $('#pw').value;
+  try {
+    const r = await fetch(API+'/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ password:p }) });
+    if (r.ok) { T=p; sessionStorage.t=p; refresh(); }
+    else login('Incorrect password.');
+  } catch(e) { login('Connection failed: ' + e.message); }
+}
+
+async function refresh(){
+  try { D = await api('/api/admin/data'); draw(); }
+  catch(e) {}
+}
+
+const un = () => Object.values(D.chats||{}).filter(c => c.unread).length;
+const openR = () => (D.refunds||[]).filter(r => r.status==='Requested').length;
+const pendingO = () => (D.orders||[]).filter(o => o.status==='Pending').length;
+const activeCarts = () => Object.values(D.carts||{}).filter(c => !c.reminded && (Date.now()-c.t < 7*864e5)).length;
+
+function draw(){
+  const N = [
+    ['home', 'Overview'],
+    ['list', 'Listings', D.products.length],
+    ['orders', 'Orders', pendingO()],
+    ['carts', 'Abandoned Carts', activeCarts()],
+    ['chat', 'Messages', un()],
+    ['refunds', 'Refunds', openR()],
+    ['mkt', 'Sales & Marketing']
+  ];
+
+  $('#app').innerHTML = `
+    <div id="sh">
+      <aside>
+        <h1>SHAH JACKETS</h1>
+        <small>Shop Manager</small>
+        ${N.map(([k,v,n]) => `
+          <a class="${tab===k?'on':''}" onclick="tab='${k}';ed=null;draw()">
+            <span>${v}</span>${n ? `<i>${n}</i>` : ''}
+          </a>
+        `).join('')}
+        <div class="sep"></div>
+        <a onclick="refresh()">↻ Refresh data</a>
+        <a onclick="sessionStorage.t='';location.reload()">Sign out</a>
+      </aside>
+      <main>
+        ${D.persistent === false ? `
+          <div class="c" style="border-color:var(--red);background:#fff5f5;color:var(--red);padding:12px 16px">
+            <b>Database Notice:</b> Using ephemeral storage (/tmp). Add <code>FIREBASE_DB_URL</code> on Vercel to preserve changes forever.
+          </div>` : ''}
+        ${V[tab] ? V[tab]() : ''}
+      </main>
+    </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// VIEW CONTROLLERS
+// ---------------------------------------------------------------------------
+const V = {
+  home(){
+    const live = (D.orders||[]).filter(o => o.status !== 'Cancelled');
+    const rev = live.reduce((a,o) => a + (+o.total||0), 0);
+    const paidRev = live.filter(o => o.paid).reduce((a,o) => a + (+o.total||0), 0);
+    const toShip = (D.orders||[]).filter(o => ['Pending','Confirmed'].includes(o.status)).length;
+    
+    return `
+      <div class="hd">
+        <h2>Dashboard Overview</h2>
+        <button class="o" onclick="refresh()">↻ Refresh</button>
+      </div>
+      <div class="st">
+        <div class="c"><b>$${rev.toFixed(2)}</b><span>Total Revenue</span></div>
+        <div class="c"><b>$${paidRev.toFixed(2)}</b><span>Collected (Paid)</span></div>
+        <div class="c"><b>${(D.orders||[]).length}</b><span>Total Orders</span></div>
+        <div class="c"><b>${toShip}</b><span>Orders to Ship</span></div>
+        <div class="c"><b>${(D.products||[]).length}</b><span>Active Jackets</span></div>
+        <div class="c"><b>${activeCarts()}</b><span>Abandoned Carts</span></div>
+        <div class="c"><b>${un()}</b><span>Unread Chats</span></div>
+        <div class="c"><b>${openR()}</b><span>Refund Requests</span></div>
+      </div>
+
+      <div class="g">
+        <div class="c">
+          <h3>Recent Orders <a style="font-size:12px;color:var(--ac);cursor:pointer" onclick="tab='orders';draw()">View all →</a></h3>
+          ${(D.orders||[]).slice(0,5).map(o => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee">
+              <div>
+                <strong>${o.id}</strong> · ${esc(o.address?.name)}<br>
+                <small style="color:#666">${new Date(o.date).toLocaleDateString()} · ${o.items?.length||0} item(s)</small>
+              </div>
+              <div style="text-align:right">
+                <b>$${(+o.total).toFixed(2)}</b><br>
+                <span class="pill ${o.status==='Delivered'?'ok':(o.status==='Pending'?'w':'')}">${o.status}</span>
+              </div>
+            </div>
+          `).join('') || '<p style="color:#777;padding:10px 0">No orders yet.</p>'}
+        </div>
+
+        <div class="c">
+          <h3>Customer Activity</h3>
+          <p style="color:#666;font-size:13px;margin-bottom:14px">
+            • <b>${un()}</b> unread chat messages waiting for reply.<br>
+            • <b>${openR()}</b> open refund requests requiring review.<br>
+            • <b>${activeCarts()}</b> customers verified their email and left items in cart.
+          </p>
+          <div style="display:flex;gap:8px">
+            <button class="a" onclick="tab='chat';draw()">Open Live Chat</button>
+            <button class="o" onclick="tab='carts';draw()">Review Carts</button>
+          </div>
+        </div>
+      </div>`;
+  },
+
+  list(){
+    if (ed) return editor();
+    return `
+      <div class="hd">
+        <h2>Jacket Listings <small>${(D.products||[]).length} active</small></h2>
+        <button class="a" onclick="ed=newP();rd()">+ Add New Jacket</button>
+      </div>
+      <div class="tb">
+        <input placeholder="Search title, description or color…" value="${esc(ls)}" oninput="ls=this.value;lg()">
+        <select onchange="lcat=this.value;lg()">
+          <option value="">All Categories</option>
+          ${Object.entries(CL).map(([k,v]) => `<option value="${k}" ${lcat===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div id="lg" class="lg">${lgH()}</div>`;
+  },
+
+  orders(){
+    const list = (D.orders||[]).filter(o => !ordFlt || o.status === ordFlt);
+    return `
+      <div class="hd">
+        <h2>Customer Orders <small>${(D.orders||[]).length} total</small></h2>
+        <div style="display:flex;gap:8px">
+          ${['', 'Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => `
+            <button class="o ${ordFlt===s?'a':''}" style="${ordFlt===s?'background:var(--ac);color:#fff;border-color:var(--ac)':''};padding:5px 12px;font-size:12px" onclick="ordFlt='${s}';draw()">
+              ${s || 'All'}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      ${list.map(o => `
+        <div class="c" style="border-left:4px solid ${o.paid?'var(--green)':'var(--warn)'}">
+          <div class="hd" style="margin-bottom:8px">
+            <div>
+              <b style="font-size:16px">${o.id}</b> · <small style="color:#666">${new Date(o.date).toLocaleString()}</small>
+              ${o.code ? `<span class="pill" style="margin-left:6px">Promo: ${esc(o.code)}</span>` : ''}
+            </div>
+            <div>
+              <span class="pill ${o.paid?'ok':'w'}">${o.paid?'PAID':'UNPAID'}</span>
+              <span class="pill" style="margin-left:4px">${o.gateway?.toUpperCase()||'COD'}</span>
+            </div>
+          </div>
+
+          <div style="margin:10px 0;background:#fafafa;padding:10px 14px;border-radius:6px">
+            ${(o.items||[]).map(i => `
+              <div style="display:flex;justify-content:space-between;padding:3px 0">
+                <span><b>${esc(i.title)}</b> (${esc(i.size)}, ${esc(i.color)}) × ${i.qty}</span>
+                <span>$${((+i.price||0) * i.qty).toFixed(2)}</span>
+              </div>
+            `).join('')}
+            <div style="border-top:1px solid #eee;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between">
+              <b>Total:</b> <b>$${(+o.total).toFixed(2)}</b>
+            </div>
+          </div>
+
+          <div class="g" style="font-size:13px;color:#444;margin-bottom:12px">
+            <div>
+              <b>Customer details:</b><br>
+              ${esc(o.address?.name)}<br>
+              ✉ ${esc(o.address?.email)}<br>
+              ☎ ${esc(o.address?.phone)}
+            </div>
+            <div>
+              <b>Shipping address:</b><br>
+              ${esc(o.address?.street)} ${esc(o.address?.apt||'')}<br>
+              ${esc(o.address?.city)}, ${esc(o.address?.state)} ${esc(o.address?.zip)}<br>
+              ${esc(o.address?.country)}
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label style="font-size:12px;color:#666">Status:</label>
+            <select style="width:auto;margin:0" onchange="api('/api/admin/order/${o.id}','POST',{status:this.value}).then(refresh)">
+              ${['Pending','Confirmed','Shipped','Delivered','Cancelled'].map(s => `
+                <option ${o.status===s?'selected':''}>${s}</option>
+              `).join('')}
+            </select>
+            <button class="o" onclick="api('/api/admin/order/${o.id}','POST',{status:'${o.status}',paid:${!o.paid}}).then(refresh)">
+              Mark as ${o.paid?'Unpaid':'Paid'}
+            </button>
+          </div>
+        </div>
+      `).join('') || '<div class="c emp">No orders match this filter.</div>'}`;
+  },
+
+  carts(){
+    const list = Object.values(D.carts||{}).sort((a,b)=>b.t-a.t);
+    return `
+      <div class="hd">
+        <h2>Abandoned Carts <small>${list.length} tracked</small></h2>
+        <button class="a" onclick="api('/api/admin/reminders','POST',{}).then(r=>{toast(r.sent+' reminder email(s) sent');refresh()})">
+          Send Reminders Now
+        </button>
+      </div>
+      <p style="color:#666;font-size:13px;margin-bottom:14px">
+        Customers who verified their email and added products to their cart. Automatic reminders trigger once every 24 hours.
+      </p>
+      ${list.map(c => `
+        <div class="c">
+          <div class="hd" style="margin-bottom:6px">
+            <div>
+              <b>${esc(c.email)}</b> · <small style="color:#666">${new Date(c.t).toLocaleString()}</small>
+            </div>
+            <div>
+              <span class="pill ${c.reminded?'ok':'w'}">${c.reminded ? 'Reminder Sent' : 'Pending Reminder'}</span>
+            </div>
+          </div>
+          <p style="font-size:13px;color:#444">
+            Items left: ${(c.items||[]).map(i => {
+              const p = (D.products||[]).find(x => x.id === i.id);
+              return `${esc(p?.title || i.id)} (${i.size}, ${i.color}) ×${i.qty}`;
+            }).join(', ')}
+          </p>
+        </div>
+      `).join('') || '<div class="c emp">No abandoned carts currently tracked.</div>'}`;
+  },
+
+  chat(){
+    const keys = Object.keys(D.chats||{}).reverse();
+    const active = D.chats?.[sid];
+    return `
+      <div class="hd">
+        <h2>Customer Inquiries</h2>
+      </div>
+      <div class="chat">
+        <div class="c cl" style="margin:0;padding:0;overflow:auto">
+          ${keys.map(s => {
+            const c = D.chats[s];
+            return `
+              <a class="${s===sid?'on':''}" onclick="sid='${s}';api('/api/admin/chat/${s}','POST',{}).then(refresh)">
+                <div>
+                  <strong>${esc(c.name || 'Guest')}</strong><br>
+                  <small style="color:#777">${c.messages?.length||0} msgs</small>
+                </div>
+                ${c.unread ? '<i style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px">NEW</i>' : ''}
+              </a>`;
+          }).join('') || '<p style="padding:16px;color:#777">No active chats.</p>'}
+        </div>
+
+        <div class="c" style="margin:0;display:flex;flex-direction:column">
+          ${active ? `
+            <h3 style="margin-bottom:10px">${esc(active.name || 'Guest')} <small>Session: ${sid}</small></h3>
+            <div id="msgs">
+              ${(active.messages||[]).map(m => `
+                <div class="m ${m.from}">
+                  ${esc(m.text)}
+                  <small>${new Date(m.t||Date.now()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</small>
+                </div>
+              `).join('')}
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <input id="rp" placeholder="Type a response…" onkeydown="if(event.key==='Enter')rp()">
+              <button class="a" onclick="rp()">Send</button>
+            </div>
+          ` : '<div class="emp" style="margin:auto">Select a customer conversation from the list to reply.</div>'}
+        </div>
+      </div>`;
+  },
+
+  refunds(){
+    const list = D.refunds || [];
+    return `
+      <div class="hd">
+        <h2>7-Day Refund Requests <small>${list.length} total</small></h2>
+      </div>
+      ${list.map(r => `
+        <div class="c">
+          <div class="hd">
+            <div>
+              <b>Request #${r.id}</b> · Order <b>#${r.orderId}</b>
+              <br><small style="color:#666">Submitted: ${new Date(r.date).toLocaleString()} by ${esc(r.email)}</small>
+            </div>
+            <div>
+              <span class="pill ${r.status==='Approved'?'ok':(r.status==='Declined'?'bad':'w')}">${r.status}</span>
+            </div>
+          </div>
+          <div style="background:#fafafa;padding:10px 14px;border-radius:6px;margin:10px 0;font-size:13px">
+            <b>Reason provided:</b><br>${esc(r.reason)}
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="a" onclick="rs('${r.id}','Approved')">Approve Request</button>
+            <button class="r" onclick="rs('${r.id}','Declined')">Decline Request</button>
+            <button class="o" onclick="rs('${r.id}','Refunded')">Mark Refund Completed</button>
+          </div>
+        </div>
+      `).join('') || '<div class="c emp">No refund requests submitted.</div>'}`;
+  },
+
+  mkt(){
+    const s = D.settings || {};
+    const b = s.specialBtn || {};
+    return `
+      <div class="hd">
+        <h2>Sales, Banners & Promo Codes</h2>
+        <button class="a" onclick="sset()">Save Store Settings</button>
+      </div>
+
+      <div class="c">
+        <h3>Sitewide Sale Campaign</h3>
+        <label style="display:inline-flex;align-items:center;margin:6px 0;cursor:pointer">
+          <input type="checkbox" id="sa" ${s.saleActive?'checked':''}>
+          <b>Enable sitewide sale</b>
+        </label>
+        <div class="g" style="margin-top:8px">
+          <div>
+            <label style="font-size:12px;color:#666">Sale Percentage Off (%)</label>
+            <input id="sp" type="number" min="0" max="90" placeholder="e.g. 20" value="${s.salePercent||''}">
+          </div>
+          <div>
+            <label style="font-size:12px;color:#666">Badge Label</label>
+            <input id="sl" placeholder="e.g. Winter Sale / Black Friday" value="${esc(s.saleLabel||'')}">
+          </div>
+        </div>
+      </div>
+
+      <div class="c">
+        <h3>Top Header Announcement Bar</h3>
+        <input id="bn" value="${esc(s.banner||'')}" placeholder="e.g. FREE SHIPPING ON ALL ORDERS | 7-DAY HASSLE-FREE RETURNS">
+      </div>
+
+      <div class="c">
+        <h3>Homepage Special Promo Button</h3>
+        <label style="display:inline-flex;align-items:center;margin:6px 0;cursor:pointer">
+          <input type="checkbox" id="bo" ${b.on?'checked':''}>
+          <b>Display button in hero section</b>
+        </label>
+        <div class="g" style="margin-top:8px">
+          <input id="bt" placeholder="Button Text (e.g. Claim 15% Off)" value="${esc(b.text||'')}">
+          <select id="bc">
+            <option value="">Select Promo Code</option>
+            ${(D.discounts||[]).map(d => `<option ${b.code===d.code?'selected':''}>${d.code}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="c">
+        <h3>Promo Discount Codes</h3>
+        <div class="g" style="grid-template-columns:1fr 1fr auto;margin-bottom:12px">
+          <input id="dc" placeholder="CODE (e.g. SHAH10)">
+          <input id="dp" type="number" placeholder="% Off (e.g. 15)">
+          <button class="a" onclick="sdc()">Create Code</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Code</th><th>Discount</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            ${(D.discounts||[]).map(d => `
+              <tr>
+                <td><b>${d.code}</b></td>
+                <td>${d.pct}% off</td>
+                <td><span class="pill ${d.active?'ok':''}">${d.active?'Active':'Paused'}</span></td>
+                <td>
+                  <button class="o" onclick="api('/api/admin/discount','POST',{code:'${d.code}',pct:${d.pct},active:${!d.active}}).then(refresh)">
+                    ${d.active?'Pause':'Resume'}
+                  </button>
+                  <button class="r" onclick="api('/api/admin/discount/${d.code}','DELETE').then(refresh)">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            `).join('') || '<tr><td colspan="4" style="color:#777;padding:12px 0">No promo codes active.</td></tr>'}
+          </tbody>
+        </table>
+      </div>`;
+  }
+};
+
+// ---------------------------------------------------------------------------
+// LISTING EDITOR & MANAGEMENT
+// ---------------------------------------------------------------------------
+const newP = () => ({ title:'', desc:'', price:'', cat:'leather', season:'All-Season', sizes:['S','M','L','XL'], custom:true, colors:[], images:[], thumbs:[] });
+const rd = () => { const y=scrollY; draw(); scrollTo(0,y); };
+
+function lgH(){
+  const q = ls.toLowerCase();
+  const L = (D.products||[]).filter(p => (!lcat || p.cat===lcat) && (!q || (p.title+' '+(p.desc||'')).toLowerCase().includes(q)));
+  if (!L.length) return `<div class="c emp" style="grid-column:1/-1">${D.products.length ? 'No listings match your search.' : 'No listings yet. Add your first jacket.'}</div>`;
+  return L.map(p => `
+    <div class="pc">
+      <div class="pi">
+        <img src="${esc((p.thumbs||[])[0]||(p.images||[])[0]||'')}" alt="">
+        ${(p.thumbs||p.images||[])[1] ? `<img class="b" src="${esc((p.thumbs||p.images)[1])}" alt="">` : ''}
+      </div>
+      <div class="bd">
+        <b>${esc(p.title)}</b>
+        <span class="pr">$${(+p.price).toFixed(2)}</span>
+        <div class="tg">
+          <i>${CL[p.cat]||p.cat}</i>
+          <i>${esc(p.season)}</i>
+          <i>${(p.images||[]).length} photo${(p.images||[]).length===1?'':'s'}</i>
+          ${(p.sizes||[]).length ? `<i>${p.sizes.join(' ')}</i>` : ''}
+          ${p.custom ? '<i>Custom</i>' : ''}
+        </div>
+        ${(p.colors||[]).length ? `<small style="color:#666">${p.colors.map(esc).join(', ')}</small>` : ''}
+      </div>
+      <div class="ac">
+        <button class="o" onclick="edit('${p.id}')">Edit</button>
+        <button class="o" onclick="dup('${p.id}')">Duplicate</button>
+        <button class="r" onclick="del('${p.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+const lg = () => { const e=$('#lg'); if(e) e.innerHTML=lgH(); };
+
+function phH(){
+  const p = ed;
+  return `
+    <h3>Photos <small>${p.images.length} photo${p.images.length===1?'':'s'} uploaded</small></h3>
+    <label class="dz" ondragover="event.preventDefault();this.classList.add('dr')" ondragleave="this.classList.remove('dr')" ondrop="event.preventDefault();this.classList.remove('dr');ph(event.dataTransfer.files)">
+      <input type="file" accept="image/*" multiple hidden onchange="ph(this.files);this.value=''">
+      <b>Click to upload photos</b> or drag & drop files here<br>
+      <span>Upload as many photos as you want. Select Primary (default cover) and Secondary (shown when mouse hovers).</span>
+    </label>
+    <div class="pts">
+      ${p.images.map((u,i) => {
+        const isPrimary = (i === 0);
+        const isSecondary = (i === 1 && p.images.length > 1);
+        return `
+        <div class="pt${isPrimary ? ' cv' : (isSecondary ? ' sc' : '')}">
+          <img src="${esc(p.thumbs[i]||u)}" alt="">
+          ${isPrimary ? '<em>Primary Cover</em>' : (isSecondary ? '<em>Secondary Hover</em>' : '')}
+          
+          <button class="tagb ${isPrimary ? 'act' : ''}" onclick="setPrimary(${i})">
+            ${isPrimary ? '★ Primary Cover' : 'Set Primary'}
+          </button>
+          <button class="tagb ${isSecondary ? 'act' : ''}" onclick="setSecondary(${i})">
+            ${isSecondary ? 'Hover Active' : 'Set Hover (2nd)'}
+          </button>
+
+          <div>
+            <button title="Move left" onclick="mv(${i},-1)" ${i?'':'disabled'}>◀</button>
+            <button title="Move right" onclick="mv(${i},1)" ${i<p.images.length-1?'':'disabled'}>▶</button>
+            <button class="x" title="Remove" onclick="rmI(${i})">✕</button>
+          </div>
+        </div>`;
+      }).join('')}
+      ${upl ? `<div class="pt up">Uploading<br>${upl}</div>` : ''}
+    </div>
+    <p class="er" id="e_img"></p>`;
+}
+const phr = () => { const e=$('#phs'); if(e) e.innerHTML=phH(); pv(); };
+
+function pv(){
+  const p = ed; if(!p || !$('#pvt')) return;
+  $('#pvt').textContent = p.title || 'Jacket title';
+  $('#pvp').textContent = p.price > 0 ? '$'+(+p.price).toFixed(2) : '$0.00';
+  const i = $('#pvi'); if(i) i.src = p.thumbs[0] || p.images[0] || '';
+  const j = $('#pv2'); if(j) { j.style.display = p.images[1] ? '' : 'none'; j.src = p.thumbs[1] || p.images[1] || ''; }
+}
+
+function fld(k,v){ ed[k]=v; ed._d=1; pv(); }
+function tg(k,v){ const a=ed[k], i=a.indexOf(v); i<0 ? a.push(v) : a.splice(i,1); ed._d=1; rd(); }
+function addc(){ const i=$('#cc'), v=i.value.trim(); if(v && !ed.colors.some(c=>c.toLowerCase()===v.toLowerCase())){ ed.colors.push(v); ed._d=1; } rd(); }
+function mv(i,d){ const j=i+d, p=ed; if(j<0||j>=p.images.length) return; [p.images[i],p.images[j]]=[p.images[j],p.images[i]]; [p.thumbs[i],p.thumbs[j]]=[p.thumbs[j],p.thumbs[i]]; ed._d=1; phr(); }
+
+function setPrimary(i){
+  const p = ed; if (i === 0) return;
+  p.images.unshift(p.images.splice(i, 1)[0]);
+  p.thumbs.unshift(p.thumbs.splice(i, 1)[0]);
+  ed._d = 1; phr(); toast('Primary cover image updated');
+}
+
+function setSecondary(i){
+  const p = ed; if (i === 1) return;
+  if (p.images.length < 2) return toast('Upload at least 2 photos first', 1);
+  const img = p.images.splice(i, 1)[0];
+  const th = p.thumbs.splice(i, 1)[0];
+  p.images.splice(1, 0, img);
+  p.thumbs.splice(1, 0, th);
+  ed._d = 1; phr(); toast('Secondary hover image updated');
+}
+
+function rmI(i){ ed.images.splice(i,1); ed.thumbs.splice(i,1); ed._d=1; phr(); }
+function cancel(){ if(ed._d && !confirm('Discard unsaved changes?')) return; ed=null; rd(); }
+
+function editor(){
+  const p = ed, cs = [...Object.keys(PC), ...p.colors.filter(c => !PC[c])];
+  return `
+    <div class="hd">
+      <h2>${p.id ? 'Edit Jacket Listing' : 'New Jacket Listing'}</h2>
+      <div>
+        <button class="o" onclick="cancel()">Cancel</button>
+        <button class="a" id="sv" onclick="saveP()">${p.id ? 'Save Changes' : 'Publish Listing'}</button>
+      </div>
+    </div>
+    <div class="eg">
+      <div>
+        <div class="c" id="phs">${phH()}</div>
+        <div class="c">
+          <h3>Title</h3>
+          <input id="ti" maxlength="80" value="${esc(p.title)}" placeholder="e.g. Classic Brown Aviator Shearling Jacket" oninput="fld('title',this.value)">
+          <p class="er" id="e_ti"></p>
+          <h3 style="margin-top:10px">Description</h3>
+          <textarea rows="7" placeholder="Leather type, craftsmanship, fit notes, care instructions…" oninput="fld('desc',this.value)">${esc(p.desc)}</textarea>
+        </div>
+      </div>
+
+      <div>
+        <div class="c">
+          <h3>Price (USD)</h3>
+          <input type="number" step="0.01" min="0" value="${esc(p.price)}" placeholder="e.g. 295.00" oninput="fld('price',this.value)">
+          <p class="er" id="e_pr"></p>
+          <h3 style="margin-top:10px">Category</h3>
+          <select onchange="fld('cat',this.value)">
+            ${Object.entries(CL).map(([k,v]) => `<option value="${k}" ${p.cat===k?'selected':''}>${v}</option>`).join('')}
+          </select>
+          <h3 style="margin-top:10px">Season Drop</h3>
+          <select onchange="fld('season',this.value)">
+            ${['All-Season','Winter','Special Season'].map(v => `<option ${p.season===v?'selected':''}>${v}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="c">
+          <h3>Sizes Available</h3>
+          ${SZ.map(s => `<button class="chip2 ${p.sizes.includes(s)?'on':''}" onclick="tg('sizes','${s}')">${s}</button>`).join('')}
+          <br>
+          <label style="display:inline-flex;align-items:center;margin-top:10px;cursor:pointer">
+            <input type="checkbox" ${p.custom?'checked':''} onchange="fld('custom',this.checked)">
+            Allow Custom Size (DM Order)
+          </label>
+          <p class="er" id="e_sz"></p>
+        </div>
+
+        <div class="c">
+          <h3>Color Palette</h3>
+          ${cs.map(c => `
+            <button class="chip2 ${p.colors.includes(c)?'on':''}" data-c="${esc(c)}" onclick="tg('colors',this.dataset.c)">
+              ${PC[c] ? `<u style="background:${PC[c]}"></u>` : ''}${esc(c)}
+            </button>
+          `).join('')}
+          <div class="g" style="grid-template-columns:1fr auto;margin-top:8px">
+            <input id="cc" placeholder="Add custom color…" onkeydown="if(event.key==='Enter'){addc();event.preventDefault()}">
+            <button class="o" onclick="addc()">Add</button>
+          </div>
+        </div>
+
+        <div class="c">
+          <h3>Storefront Preview <small>(Hover mouse to test 2nd photo)</small></h3>
+          <div class="pc" style="max-width:210px">
+            <div class="pi">
+              <img id="pvi" src="${esc(p.thumbs[0]||p.images[0]||'')}" alt="">
+              <img class="b" id="pv2" src="${esc(p.thumbs[1]||p.images[1]||'')}" alt="" ${p.images[1]?'':'style="display:none"'}>
+            </div>
+            <div class="bd">
+              <b id="pvt">${esc(p.title||'Jacket title')}</b>
+              <span class="pr" id="pvp">$${(+p.price||0).toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+const shrink = (src, m, q) => new Promise(r => {
+  const i = new Image();
+  i.onload = () => {
+    const k = Math.min(1, m / Math.max(i.width, i.height));
+    const c = document.createElement('canvas');
+    c.width = i.width * k; c.height = i.height * k;
+    c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+    r(c.toDataURL('image/jpeg', q));
+  };
+  i.src = src;
+});
+
+async function up(d){
+  const r = await api('/api/admin/image', 'POST', { data:d });
+  if (!r.url) throw new Error(r.error || 'Upload error');
+  return r.url;
+}
+
+async function ph(fs){
+  const E = ed;
+  fs = [...fs].filter(f => f.type.startsWith('image/'));
+  if (!fs.length) return;
+  
+  let n = 0;
+  try {
+    for (const f of fs) {
+      upl = `${++n} of ${fs.length}`;
+      if (ed === E) phr();
+      const src = await new Promise(r => {
+        const x = new FileReader(); x.onload = () => r(x.result); x.readAsDataURL(f);
+      });
+      const a = await up(await shrink(src, 1000, .78));
+      const b = await up(await shrink(src, 420, .7));
+      E.images.push(a); E.thumbs.push(b); E._d = 1;
+    }
+  } catch(e) {
+    toast('Upload failed: ' + (e.message || e), 1);
+  }
+  upl = '';
+  if (ed === E) phr();
+}
+
+async function saveP(){
+  const p = ed, E = {};
+  if (!p.images.length) E.img = 'Add at least one jacket photo.';
+  if (!p.title.trim()) E.ti = 'Title is required.';
+  if (!(+p.price > 0)) E.pr = 'Enter a valid price greater than $0.';
+  if (!p.sizes.length && !p.custom) E.sz = 'Select at least one standard size or allow custom sizing.';
+
+  ['img','ti','pr','sz'].forEach(k => { const e=$('#e_'+k); if(e) e.textContent = E[k] || ''; });
+  const first = Object.keys(E)[0];
+  if (first) { $('#e_'+first).scrollIntoView({ block:'center', behavior:'smooth' }); return; }
+  if (upl) return toast('Please wait for photos to finish uploading', 1);
+
+  const b = $('#sv'); b.disabled = true; b.textContent = 'Saving…';
+  try {
+    const r = await api('/api/admin/product', 'POST', {
+      id: p.id,
+      title: p.title.trim(),
+      desc: p.desc,
+      price: +(+p.price).toFixed(2),
+      cat: p.cat,
+      season: p.season,
+      sizes: SZ.filter(s => p.sizes.includes(s)),
+      custom: p.custom,
+      colors: p.colors,
+      images: p.images,
+      thumbs: p.thumbs
+    });
+    if (r.error) throw new Error(r.error);
+    ed = null;
+    await refresh();
+    toast(p.id ? 'Changes saved successfully' : 'Jacket published to store');
+  } catch(e) {
+    b.disabled = false; b.textContent = 'Try again';
+    toast('Could not save: ' + (e.message || 'connection error'), 1);
+  }
+}
+
+function edit(id, copy){
+  const p = D.products.find(x => x.id === id);
+  const im = [...(p.images || [])];
+  ed = {
+    ...p,
+    desc: p.desc || '',
+    sizes: [...(p.sizes || [])],
+    colors: [...(p.colors || [])],
+    images: im,
+    thumbs: im.map((u, i) => (p.thumbs || [])[i] || u),
+    custom: p.custom !== false
+  };
+  if (copy) { delete ed.id; ed.title += ' (Copy)'; ed._d = 1; }
+  rd(); scrollTo(0, 0);
+}
+
+const dup = id => edit(id, 1);
+async function del(id){
+  if (confirm('Delete this jacket listing? This action cannot be undone.')){
+    try {
+      await api('/api/admin/product/' + id, 'DELETE');
+      await refresh();
+      toast('Listing deleted');
+    } catch(e) { toast('Could not delete listing', 1); }
+  }
+}
+
+async function sset(){
+  await api('/api/admin/settings', 'POST', {
+    saleActive: $('#sa').checked,
+    salePercent: +$('#sp').value || 0,
+    saleLabel: $('#sl').value,
+    banner: $('#bn').value,
+    specialBtn: { on:$('#bo').checked, text:$('#bt').value, code:$('#bc').value }
+  });
+  await refresh();
+  toast('Store settings saved');
+}
+
+async function sdc(){
+  const code = $('#dc').value, pct = $('#dp').value;
+  if (!code || !pct) return alert('Enter both promo code and percentage.');
+  await api('/api/admin/discount', 'POST', { code, pct });
+  $('#dc').value = ''; $('#dp').value = '';
+  refresh();
+  toast('Promo code added');
+}
+
+async function rp(){
+  const v = $('#rp').value.trim();
+  if (v && sid) {
+    await api('/api/admin/chat/' + sid, 'POST', { text:v });
+    $('#rp').value = '';
+    await refresh();
+    const m = $('#msgs'); if (m) m.scrollTop = 1e6;
+  }
+}
+
+const rs = (id, s) => api('/api/admin/refund/' + id, 'POST', { status:s }).then(refresh);
+
+// Periodic polling when logged in
+setInterval(() => {
+  if (T && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName) && tab !== 'list') refresh();
+}, 8000);
+
+// Initialize
+T ? refresh() : login();
 </script></body></html>

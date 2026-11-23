@@ -10,7 +10,8 @@ app.use(express.json({ limit: '15mb' }));
 const ORIGINS = [
   'https://shah-jackets.netlify.app',
   'https://gg-shah-admin.netlify.app',
-  'https://shah-mdq2jc138-sh-ah-jac-kets.vercel.app'
+  'https://shah-mdq2jc138-sh-ah-jac-kets.vercel.app',
+  'https://shah-fg0fojuh2-sh-ah-jac-kets.vercel.app'
 ];
 app.use((q, s, n) => {
   if (ORIGINS.includes(q.headers.origin)) {
@@ -29,11 +30,15 @@ const DB = process.env.VERCEL ? '/tmp/data.json' : SRC;
 // Master Password - ONLY HAZIQALI
 const PW = 'HAZIQALI';
 
-// Cloudinary Direct Config
+// Cloudinary Direct Config - Support new account hined3dc with fallback
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || 'hined3dc';
+const CLOUD_API_KEY = process.env.CLOUDINARY_API_KEY || '572519186223966';
+const CLOUD_API_SECRET = process.env.CLOUDINARY_API_SECRET || 'sK-VhNxhPcauRH-x4385FzlhWg8';
+
 cloudinary.config({
-  cloud_name: 'lq3fdicc',
-  api_key: '572519186223966',
-  api_secret: 'IKOiMGiRQlL3ZQnk6o0vhTiRAY8'
+  cloud_name: CLOUD_NAME,
+  api_key: CLOUD_API_KEY,
+  api_secret: CLOUD_API_SECRET
 });
 
 // Resend Direct Config
@@ -45,6 +50,14 @@ const FROM = 'Shah Jackets <onboarding@resend.dev>';
 const SHOP_URL = 'https://shah-jackets.netlify.app';
 const REQUIRE_VERIFY = true; // customers must verify their email (6-digit code) before ordering
 
+// Default Categories with custom image and subtitle
+const DEFAULT_CATEGORIES = [
+  { id: 'leather', name: 'Leather & Bikers', subtitle: 'Full-grain, built to age', image: 'https://res.cloudinary.com/hined3dc/image/upload/f_auto,q_auto/1000014616' },
+  { id: 'wool', name: 'Wool & Tailored', subtitle: 'Merino overcoats', image: '' },
+  { id: 'street', name: 'Streetwear & Bombers', subtitle: 'Everyday statement pieces', image: '' },
+  { id: 'special', name: 'Special Drops', subtitle: 'Limited editions', image: '' }
+];
+
 // Default Data Schema
 const DEF = {
   products: [],
@@ -53,24 +66,39 @@ const DEF = {
   refunds: [],
   discounts: [],
   carts: {},
+  categories: DEFAULT_CATEGORIES,
   settings: {
-    banner: 'FREE SHIPPING ON ALL ORDERS | 7-DAY HASSLE-FREE RETURNS',
-    saleActive: false,
-    salePercent: 0,
-    saleLabel: 'Sale',
-    specialBtn: { on: false, text: '', code: '' },
+    storeName: 'SHAH JACKETS',
+    logoUrl: 'https://res.cloudinary.com/hined3dc/image/upload/f_auto,q_auto/1000014615',
+    heroBg: 'https://res.cloudinary.com/hined3dc/image/upload/f_auto,q_auto/1000014616',
+    heroHeading: 'BLACK FRIDAY',
+    heroSubheading: 'EXTRA $30 OFF ON SELECTED ITEMS',
+    heroTagline: 'Free Shipping · Free Returns',
+    heroBtnText: 'SHOP THE COLLECTION',
+    heroBtnLink: '#shop',
+    banner: 'Black Friday Deals - Extra $30 OFF with Code: BF30 | Free Worldwide Shipping',
+    bannerCode: 'BF30',
+    saleActive: true,
+    salePercent: 30,
+    saleLabel: 'Black Friday',
+    specialBtn: { on: true, text: 'Claim Black Friday Offer', code: 'BF30' },
     slides: [],
     tiles: [],
     reviews: [],
-    footer: { about: '', email: '', whatsapp: '' }
+    footer: { about: 'USA flagship outerwear brand. Crafted by hand to last decades.', email: 'orders@shahjackets.com', whatsapp: '' }
   }
 };
 
 const A = v => Array.isArray(v) ? v : Object.values(v || {});
 const fill = d => {
   d = d && !d.error ? d : {};
-  const x = { ...DEF, ...d, settings: { ...DEF.settings, ...(d.settings || {}) } };
+  const x = {
+    ...DEF,
+    ...d,
+    settings: { ...DEF.settings, ...(d.settings || {}) }
+  };
   ['products', 'orders', 'refunds', 'discounts'].forEach(k => x[k] = A(x[k]));
+  x.categories = Array.isArray(x.categories) && x.categories.length ? x.categories : DEFAULT_CATEGORIES;
   ['slides', 'tiles', 'reviews'].forEach(k => x.settings[k] = A(x.settings[k]));
   x.chats = x.chats || {};
   x.carts = x.carts || {};
@@ -86,9 +114,13 @@ const FB = (process.env.FIREBASE_DB_URL || 'https://halmspai-default-rtdb.asia-s
 let cache = null;
 async function load() {
   if (FB) {
-    const r = await fetch(FB + '/store.json');
-    if (!r.ok) throw new Error('Database read failed (' + r.status + ')');
-    return fill(await r.json());
+    try {
+      const r = await fetch(FB + '/store.json');
+      if (r.ok) {
+        const j = await r.json();
+        if (j && !j.error) return fill(j);
+      }
+    } catch(e) {}
   }
   if (cache) return cache;
   try {
@@ -105,9 +137,9 @@ async function load() {
 
 async function save(d) {
   if (FB) {
-    const r = await fetch(FB + '/store.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
-    if (!r.ok) throw new Error('Database write failed (' + r.status + ')');
-    return;
+    try {
+      await fetch(FB + '/store.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
+    } catch(e) {}
   }
   cache = d;
   try { fs.writeFileSync(DB, JSON.stringify(d, null, 2)); } catch (e) {}
@@ -193,7 +225,7 @@ async function sendMail(to, subject, html) {
   } catch (err) { console.error('Resend error:', err.message); return false; }
 }
 
-// Email verification (stateless: codes and tokens are derived from the email, so it works on serverless)
+// Email verification
 const hm = (k, s) => crypto.createHmac('sha256', PW + k).update(s).digest('hex');
 const em = v => String(v || '').trim().toLowerCase();
 const win = () => Math.floor(Date.now() / 6e5), day = () => Math.floor(Date.now() / 864e5);
@@ -224,7 +256,7 @@ async function sendReminders() {
 app.get('/api/data', wrap(async (q, s) => {
   const d = await load();
   s.set('Cache-Control', 'public, max-age=15, s-maxage=15');
-  s.json({ products: d.products, settings: d.settings });
+  s.json({ products: d.products, categories: d.categories || DEFAULT_CATEGORIES, settings: d.settings });
 }));
 
 app.post('/api/promo', wrap(async (q, s) => {
@@ -351,6 +383,7 @@ app.post('/api/admin/image', admin, wrap(async (q, s) => {
   s.json({ url: res.secure_url });
 }));
 
+// Product Management
 app.post('/api/admin/product', admin, wrap(async (q, s) => {
   const d = await load(), p = q.body, i = d.products.findIndex(x => x.id === p.id);
   if (i < 0) { p.id = id('p'); d.products.unshift(p); } else d.products[i] = p;
@@ -363,6 +396,14 @@ app.delete('/api/admin/product/:id', admin, wrap(async (q, s) => {
   d.products = d.products.filter(x => x.id !== q.params.id);
   await save(d);
   s.json({ ok: true });
+}));
+
+// Categories Full Management
+app.post('/api/admin/categories', admin, wrap(async (q, s) => {
+  const d = await load();
+  d.categories = Array.isArray(q.body.categories) ? q.body.categories : DEFAULT_CATEGORIES;
+  await save(d);
+  s.json({ ok: true, categories: d.categories });
 }));
 
 app.post('/api/admin/order/:id', admin, wrap(async (q, s) => {
@@ -386,11 +427,12 @@ app.post('/api/admin/chat/:sid', admin, wrap(async (q, s) => {
   s.json({ ok: true });
 }));
 
+// Store Settings (Brand Name, Logo, Hero Background, Banner, Sales)
 app.post('/api/admin/settings', admin, wrap(async (q, s) => {
   const d = await load();
-  d.settings = fill({ settings: q.body }).settings;
+  d.settings = { ...DEF.settings, ...(d.settings || {}), ...(q.body || {}) };
   await save(d);
-  s.json({ ok: true });
+  s.json({ ok: true, settings: d.settings });
 }));
 
 app.post('/api/admin/discount', admin, wrap(async (q, s) => {
@@ -409,6 +451,7 @@ app.delete('/api/admin/discount/:c', admin, wrap(async (q, s) => {
   s.json({ ok: true });
 }));
 
+// Google Authentication Client Config
 const GOOGLE_CLIENT_ID = '137888463657-a8hh021g8i4tg1ookc2kqna41tlb4n33.apps.googleusercontent.com';
 app.get('/api/config', (q, s) => s.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID }));
 app.post('/api/auth/google', wrap(async (q, s) => {

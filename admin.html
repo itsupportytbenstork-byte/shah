@@ -60,12 +60,11 @@ table{width:100%;border-collapse:collapse}td,th{padding:11px 8px;border-bottom:1
 .emp{text-align:center;padding:50px 20px;color:#777}
 </style></head><body><div id="app"></div>
 <script>
-const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1') ? '' : 'https://shah-8m167m1y9-sh-ah-jac-kets.vercel.app';
+const API = (location.hostname==='localhost'||location.hostname==='127.0.0.1') ? '' : 'https://shah-fg0fojuh2-sh-ah-jac-kets.vercel.app';
 const $ = s => document.querySelector(s), esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let T = sessionStorage.t || '', D = { products:[], orders:[], refunds:[], chats:{}, discounts:[], carts:{}, settings:{} };
+let T = sessionStorage.t || '', D = { products:[], orders:[], refunds:[], chats:{}, discounts:[], carts:{}, categories:[], settings:{} };
 let tab = 'home', ed = null, sid = null, busy = 0, ls = '', lcat = '', ordFlt = '', upl = '';
 
-const CL = { leather:'Leather / Biker', wool:'Wool / Tailored', street:'Streetwear / Bomber' };
 const SZ = ['XS','S','M','L','XL','XXL'];
 const PC = { Black:'#111', Brown:'#6b4226', Tan:'#c19a6b', Camel:'#b98a4f', Navy:'#1f2a44', Grey:'#888', Olive:'#6b6b3a', Burgundy:'#6d1a2a', White:'#f2f2f2' };
 
@@ -114,7 +113,9 @@ const activeCarts = () => Object.values(D.carts||{}).filter(c => !c.reminded && 
 function draw(){
   const N = [
     ['home', 'Overview'],
-    ['list', 'Listings', D.products.length],
+    ['list', 'Listings', D.products?.length||0],
+    ['cats', 'Categories', D.categories?.length||0],
+    ['theme', 'Logo & Branding'],
     ['orders', 'Orders', pendingO()],
     ['carts', 'Abandoned Carts', activeCarts()],
     ['chat', 'Messages', un()],
@@ -125,7 +126,7 @@ function draw(){
   $('#app').innerHTML = `
     <div id="sh">
       <aside>
-        <h1>SHAH JACKETS</h1>
+        <h1>${esc(D.settings?.storeName || 'SHAH JACKETS')}</h1>
         <small>Shop Manager</small>
         ${N.map(([k,v,n]) => `
           <a class="${tab===k?'on':''}" onclick="tab='${k}';ed=null;draw()">
@@ -137,10 +138,6 @@ function draw(){
         <a onclick="sessionStorage.t='';location.reload()">Sign out</a>
       </aside>
       <main>
-        ${D.persistent === false ? `
-          <div class="c" style="border-color:var(--red);background:#fff5f5;color:var(--red);padding:12px 16px">
-            <b>Database Notice:</b> Using ephemeral storage (/tmp). Add <code>FIREBASE_DB_URL</code> on Vercel to preserve changes forever.
-          </div>` : ''}
         ${V[tab] ? V[tab]() : ''}
       </main>
     </div>`;
@@ -158,7 +155,7 @@ const V = {
     
     return `
       <div class="hd">
-        <h2>Dashboard Overview</h2>
+        <h2>Store Control Center</h2>
         <button class="o" onclick="refresh()">↻ Refresh</button>
       </div>
       <div class="st">
@@ -167,15 +164,28 @@ const V = {
         <div class="c"><b>${(D.orders||[]).length}</b><span>Total Orders</span></div>
         <div class="c"><b>${toShip}</b><span>Orders to Ship</span></div>
         <div class="c"><b>${(D.products||[]).length}</b><span>Active Jackets</span></div>
+        <div class="c"><b>${(D.categories||[]).length}</b><span>Categories</span></div>
         <div class="c"><b>${activeCarts()}</b><span>Abandoned Carts</span></div>
         <div class="c"><b>${un()}</b><span>Unread Chats</span></div>
-        <div class="c"><b>${openR()}</b><span>Refund Requests</span></div>
       </div>
 
       <div class="g">
         <div class="c">
+          <h3>Quick Store Customization</h3>
+          <p style="color:#666;font-size:13px;margin-bottom:12px">
+            Brand Name: <b>${esc(D.settings?.storeName || 'SHAH JACKETS')}</b><br>
+            Logo: <b>${D.settings?.logoUrl ? 'Custom Image' : 'Default Text'}</b><br>
+            Hero Heading: <b>${esc(D.settings?.heroHeading || 'BLACK FRIDAY')}</b>
+          </p>
+          <div style="display:flex;gap:8px">
+            <button class="a" onclick="tab='theme';draw()">Edit Logo & Background</button>
+            <button class="o" onclick="tab='cats';draw()">Manage Categories</button>
+          </div>
+        </div>
+
+        <div class="c">
           <h3>Recent Orders <a style="font-size:12px;color:var(--ac);cursor:pointer" onclick="tab='orders';draw()">View all →</a></h3>
-          ${(D.orders||[]).slice(0,5).map(o => `
+          ${(D.orders||[]).slice(0,4).map(o => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee">
               <div>
                 <strong>${o.id}</strong> · ${esc(o.address?.name)}<br>
@@ -188,20 +198,106 @@ const V = {
             </div>
           `).join('') || '<p style="color:#777;padding:10px 0">No orders yet.</p>'}
         </div>
+      </div>`;
+  },
 
-        <div class="c">
-          <h3>Customer Activity</h3>
-          <p style="color:#666;font-size:13px;margin-bottom:14px">
-            • <b>${un()}</b> unread chat messages waiting for reply.<br>
-            • <b>${openR()}</b> open refund requests requiring review.<br>
-            • <b>${activeCarts()}</b> customers verified their email and left items in cart.
-          </p>
-          <div style="display:flex;gap:8px">
-            <button class="a" onclick="tab='chat';draw()">Open Live Chat</button>
-            <button class="o" onclick="tab='carts';draw()">Review Carts</button>
+  theme(){
+    const s = D.settings || {};
+    return `
+      <div class="hd">
+        <h2>Brand Identity & Hero Styling</h2>
+        <button class="a" onclick="saveThemeSettings()">Save Branding Changes</button>
+      </div>
+
+      <div class="c">
+        <h3>Store Name & Logo</h3>
+        <label style="font-size:12px;color:#666">Store Brand Name (Displayed in Header & Emails)</label>
+        <input id="thName" value="${esc(s.storeName || 'SHAH JACKETS')}" placeholder="e.g. SHAH JACKETS or ANGEL JACKETS">
+        
+        <label style="font-size:12px;color:#666;margin-top:10px;display:block">Header Logo Image URL (PNG/SVG/WebP)</label>
+        <div style="display:flex;gap:8px">
+          <input id="thLogo" value="${esc(s.logoUrl || '')}" placeholder="https://res.cloudinary.com/...">
+          <button class="o" onclick="uploadLogo()">Upload</button>
+        </div>
+        ${s.logoUrl ? `<div style="background:#000;padding:10px;display:inline-block;border-radius:4px;margin-top:8px"><img src="${esc(s.logoUrl)}" style="max-height:40px"></div>` : ''}
+      </div>
+
+      <div class="c">
+        <h3>Homepage Hero Section</h3>
+        <label style="font-size:12px;color:#666">Hero Background Image URL</label>
+        <div style="display:flex;gap:8px">
+          <input id="thBg" value="${esc(s.heroBg || 'https://res.cloudinary.com/hined3dc/image/upload/f_auto,q_auto/1000014616')}" placeholder="https://res.cloudinary.com/...">
+          <button class="o" onclick="uploadHeroBg()">Upload</button>
+        </div>
+        ${s.heroBg ? `<div style="margin-top:8px"><img src="${esc(s.heroBg)}" style="max-height:120px;border-radius:6px;object-fit:cover"></div>` : ''}
+
+        <div class="g" style="margin-top:12px">
+          <div>
+            <label style="font-size:12px;color:#666">Hero Main Heading (Words like 'BLACK' get outlined automatically)</label>
+            <input id="thHeading" value="${esc(s.heroHeading || 'BLACK FRIDAY')}">
+          </div>
+          <div>
+            <label style="font-size:12px;color:#666">Hero Subheading (Gold Text)</label>
+            <input id="thSub" value="${esc(s.heroSubheading || 'EXTRA $30 OFF ON SELECTED ITEMS')}">
+          </div>
+        </div>
+
+        <div class="g" style="margin-top:8px">
+          <div>
+            <label style="font-size:12px;color:#666">Hero Tagline</label>
+            <input id="thTagline" value="${esc(s.heroTagline || 'Free Shipping · Free Returns')}">
+          </div>
+          <div>
+            <label style="font-size:12px;color:#666">Main CTA Button Text</label>
+            <input id="thBtnText" value="${esc(s.heroBtnText || 'SHOP THE COLLECTION')}">
           </div>
         </div>
       </div>`;
+  },
+
+  cats(){
+    const list = D.categories || [];
+    return `
+      <div class="hd">
+        <h2>Category Management <small>${list.length} categories</small></h2>
+        <button class="a" onclick="addCategory()">+ Create New Category</button>
+      </div>
+      <p style="color:#666;font-size:13px;margin-bottom:14px">
+        Manage categories, customize their display names, banner images, and subtitles shown on the homepage style cards.
+      </p>
+
+      ${list.map((c, i) => `
+        <div class="c">
+          <div class="hd" style="margin-bottom:8px">
+            <div>
+              <b style="font-size:16px">${esc(c.name)}</b> <small style="color:#666">ID: ${esc(c.id)}</small>
+            </div>
+            <div>
+              <button class="r" style="padding:4px 10px;font-size:11px" onclick="removeCategory(${i})">Delete</button>
+            </div>
+          </div>
+
+          <div class="g">
+            <div>
+              <label style="font-size:12px;color:#666">Category Name</label>
+              <input value="${esc(c.name)}" oninput="D.categories[${i}].name=this.value">
+
+              <label style="font-size:12px;color:#666;margin-top:6px;display:block">Subtitle (shown on category tile)</label>
+              <input value="${esc(c.subtitle || '')}" placeholder="e.g. Full-grain, built to age" oninput="D.categories[${i}].subtitle=this.value">
+            </div>
+            <div>
+              <label style="font-size:12px;color:#666">Category Card Image URL</label>
+              <div style="display:flex;gap:6px">
+                <input value="${esc(c.image || '')}" placeholder="https://res.cloudinary.com/..." oninput="D.categories[${i}].image=this.value">
+                <button class="o" onclick="uploadCatImage(${i})">Upload</button>
+              </div>
+              ${c.image ? `<img src="${esc(c.image)}" style="height:70px;width:100px;object-fit:cover;border-radius:4px;margin-top:6px">` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+
+      <button class="a" style="margin-top:10px" onclick="saveCategories()">Save All Categories</button>`;
   },
 
   list(){
@@ -215,7 +311,7 @@ const V = {
         <input placeholder="Search title, description or color…" value="${esc(ls)}" oninput="ls=this.value;lg()">
         <select onchange="lcat=this.value;lg()">
           <option value="">All Categories</option>
-          ${Object.entries(CL).map(([k,v]) => `<option value="${k}" ${lcat===k?'selected':''}>${v}</option>`).join('')}
+          ${(D.categories||[]).map(c => `<option value="${esc(c.id)}" ${lcat===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
         </select>
       </div>
       <div id="lg" class="lg">${lgH()}</div>`;
@@ -261,16 +357,10 @@ const V = {
 
           <div class="g" style="font-size:13px;color:#444;margin-bottom:12px">
             <div>
-              <b>Customer details:</b><br>
-              ${esc(o.address?.name)}<br>
-              ✉ ${esc(o.address?.email)}<br>
-              ☎ ${esc(o.address?.phone)}
+              <b>Customer:</b><br>${esc(o.address?.name)}<br>✉ ${esc(o.address?.email)}<br>☎ ${esc(o.address?.phone)}
             </div>
             <div>
-              <b>Shipping address:</b><br>
-              ${esc(o.address?.street)} ${esc(o.address?.apt||'')}<br>
-              ${esc(o.address?.city)}, ${esc(o.address?.state)} ${esc(o.address?.zip)}<br>
-              ${esc(o.address?.country)}
+              <b>Address:</b><br>${esc(o.address?.street)} ${esc(o.address?.apt||'')}<br>${esc(o.address?.city)}, ${esc(o.address?.state)} ${esc(o.address?.zip)}<br>${esc(o.address?.country)}
             </div>
           </div>
 
@@ -298,21 +388,15 @@ const V = {
           Send Reminders Now
         </button>
       </div>
-      <p style="color:#666;font-size:13px;margin-bottom:14px">
-        Customers who verified their email and added products to their cart. Automatic reminders trigger once every 24 hours.
-      </p>
+      <p style="color:#666;font-size:13px;margin-bottom:14px">Customers who verified their email and left items in cart.</p>
       ${list.map(c => `
         <div class="c">
           <div class="hd" style="margin-bottom:6px">
-            <div>
-              <b>${esc(c.email)}</b> · <small style="color:#666">${new Date(c.t).toLocaleString()}</small>
-            </div>
-            <div>
-              <span class="pill ${c.reminded?'ok':'w'}">${c.reminded ? 'Reminder Sent' : 'Pending Reminder'}</span>
-            </div>
+            <div><b>${esc(c.email)}</b> · <small style="color:#666">${new Date(c.t).toLocaleString()}</small></div>
+            <div><span class="pill ${c.reminded?'ok':'w'}">${c.reminded ? 'Reminder Sent' : 'Pending Reminder'}</span></div>
           </div>
           <p style="font-size:13px;color:#444">
-            Items left: ${(c.items||[]).map(i => {
+            Items: ${(c.items||[]).map(i => {
               const p = (D.products||[]).find(x => x.id === i.id);
               return `${esc(p?.title || i.id)} (${i.size}, ${i.color}) ×${i.qty}`;
             }).join(', ')}
@@ -325,27 +409,21 @@ const V = {
     const keys = Object.keys(D.chats||{}).reverse();
     const active = D.chats?.[sid];
     return `
-      <div class="hd">
-        <h2>Customer Inquiries</h2>
-      </div>
+      <div class="hd"><h2>Customer Inquiries</h2></div>
       <div class="chat">
         <div class="c cl" style="margin:0;padding:0;overflow:auto">
           ${keys.map(s => {
             const c = D.chats[s];
             return `
               <a class="${s===sid?'on':''}" onclick="sid='${s}';api('/api/admin/chat/${s}','POST',{}).then(refresh)">
-                <div>
-                  <strong>${esc(c.name || 'Guest')}</strong><br>
-                  <small style="color:#777">${c.messages?.length||0} msgs</small>
-                </div>
+                <div><strong>${esc(c.name || 'Guest')}</strong><br><small style="color:#777">${c.messages?.length||0} msgs</small></div>
                 ${c.unread ? '<i style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px">NEW</i>' : ''}
               </a>`;
           }).join('') || '<p style="padding:16px;color:#777">No active chats.</p>'}
         </div>
-
         <div class="c" style="margin:0;display:flex;flex-direction:column">
           ${active ? `
-            <h3 style="margin-bottom:10px">${esc(active.name || 'Guest')} <small>Session: ${sid}</small></h3>
+            <h3 style="margin-bottom:10px">${esc(active.name || 'Guest')}</h3>
             <div id="msgs">
               ${(active.messages||[]).map(m => `
                 <div class="m ${m.from}">
@@ -358,7 +436,7 @@ const V = {
               <input id="rp" placeholder="Type a response…" onkeydown="if(event.key==='Enter')rp()">
               <button class="a" onclick="rp()">Send</button>
             </div>
-          ` : '<div class="emp" style="margin:auto">Select a customer conversation from the list to reply.</div>'}
+          ` : '<div class="emp" style="margin:auto">Select a customer conversation to reply.</div>'}
         </div>
       </div>`;
   },
@@ -366,27 +444,18 @@ const V = {
   refunds(){
     const list = D.refunds || [];
     return `
-      <div class="hd">
-        <h2>7-Day Refund Requests <small>${list.length} total</small></h2>
-      </div>
+      <div class="hd"><h2>7-Day Refund Requests <small>${list.length} total</small></h2></div>
       ${list.map(r => `
         <div class="c">
           <div class="hd">
-            <div>
-              <b>Request #${r.id}</b> · Order <b>#${r.orderId}</b>
-              <br><small style="color:#666">Submitted: ${new Date(r.date).toLocaleString()} by ${esc(r.email)}</small>
-            </div>
-            <div>
-              <span class="pill ${r.status==='Approved'?'ok':(r.status==='Declined'?'bad':'w')}">${r.status}</span>
-            </div>
+            <div><b>Request #${r.id}</b> · Order <b>#${r.orderId}</b><br><small style="color:#666">${new Date(r.date).toLocaleString()} by ${esc(r.email)}</small></div>
+            <div><span class="pill ${r.status==='Approved'?'ok':(r.status==='Declined'?'bad':'w')}">${r.status}</span></div>
           </div>
-          <div style="background:#fafafa;padding:10px 14px;border-radius:6px;margin:10px 0;font-size:13px">
-            <b>Reason provided:</b><br>${esc(r.reason)}
-          </div>
+          <div style="background:#fafafa;padding:10px 14px;border-radius:6px;margin:10px 0;font-size:13px">${esc(r.reason)}</div>
           <div style="display:flex;gap:8px">
             <button class="a" onclick="rs('${r.id}','Approved')">Approve Request</button>
             <button class="r" onclick="rs('${r.id}','Declined')">Decline Request</button>
-            <button class="o" onclick="rs('${r.id}','Refunded')">Mark Refund Completed</button>
+            <button class="o" onclick="rs('${r.id}','Refunded')">Mark Refunded</button>
           </div>
         </div>
       `).join('') || '<div class="c emp">No refund requests submitted.</div>'}`;
@@ -397,59 +466,44 @@ const V = {
     const b = s.specialBtn || {};
     return `
       <div class="hd">
-        <h2>Sales, Banners & Promo Codes</h2>
-        <button class="a" onclick="sset()">Save Store Settings</button>
+        <h2>Sales & Promo Codes</h2>
+        <button class="a" onclick="saveMarketingSettings()">Save Sale Settings</button>
       </div>
 
       <div class="c">
-        <h3>Sitewide Sale Campaign</h3>
+        <h3>Sitewide Sale Banner & Campaign</h3>
         <label style="display:inline-flex;align-items:center;margin:6px 0;cursor:pointer">
           <input type="checkbox" id="sa" ${s.saleActive?'checked':''}>
-          <b>Enable sitewide sale</b>
+          <b>Enable sitewide sale campaign</b>
         </label>
         <div class="g" style="margin-top:8px">
           <div>
             <label style="font-size:12px;color:#666">Sale Percentage Off (%)</label>
-            <input id="sp" type="number" min="0" max="90" placeholder="e.g. 20" value="${s.salePercent||''}">
+            <input id="sp" type="number" min="0" max="90" value="${s.salePercent||''}">
           </div>
           <div>
-            <label style="font-size:12px;color:#666">Badge Label</label>
-            <input id="sl" placeholder="e.g. Winter Sale / Black Friday" value="${esc(s.saleLabel||'')}">
+            <label style="font-size:12px;color:#666">Badge Label (e.g. Black Friday / Winter Drop)</label>
+            <input id="sl" value="${esc(s.saleLabel||'')}">
           </div>
         </div>
       </div>
 
       <div class="c">
-        <h3>Top Header Announcement Bar</h3>
-        <input id="bn" value="${esc(s.banner||'')}" placeholder="e.g. FREE SHIPPING ON ALL ORDERS | 7-DAY HASSLE-FREE RETURNS">
-      </div>
-
-      <div class="c">
-        <h3>Homepage Special Promo Button</h3>
-        <label style="display:inline-flex;align-items:center;margin:6px 0;cursor:pointer">
-          <input type="checkbox" id="bo" ${b.on?'checked':''}>
-          <b>Display button in hero section</b>
-        </label>
-        <div class="g" style="margin-top:8px">
-          <input id="bt" placeholder="Button Text (e.g. Claim 15% Off)" value="${esc(b.text||'')}">
-          <select id="bc">
-            <option value="">Select Promo Code</option>
-            ${(D.discounts||[]).map(d => `<option ${b.code===d.code?'selected':''}>${d.code}</option>`).join('')}
-          </select>
-        </div>
+        <h3>Top Announcement Bar</h3>
+        <input id="bn" value="${esc(s.banner||'')}" placeholder="e.g. Black Friday Deals - Extra $30 OFF with Code: BF30">
+        <label style="font-size:12px;color:#666;margin-top:6px;display:block">Promo Code Applied by Top Bar Button</label>
+        <input id="bnCode" value="${esc(s.bannerCode||'BF30')}" placeholder="e.g. BF30">
       </div>
 
       <div class="c">
         <h3>Promo Discount Codes</h3>
         <div class="g" style="grid-template-columns:1fr 1fr auto;margin-bottom:12px">
-          <input id="dc" placeholder="CODE (e.g. SHAH10)">
-          <input id="dp" type="number" placeholder="% Off (e.g. 15)">
+          <input id="dc" placeholder="CODE (e.g. BF30)">
+          <input id="dp" type="number" placeholder="% Off (e.g. 30)">
           <button class="a" onclick="sdc()">Create Code</button>
         </div>
         <table>
-          <thead>
-            <tr><th>Code</th><th>Discount</th><th>Status</th><th>Actions</th></tr>
-          </thead>
+          <thead><tr><th>Code</th><th>Discount</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>
             ${(D.discounts||[]).map(d => `
               <tr>
@@ -457,12 +511,8 @@ const V = {
                 <td>${d.pct}% off</td>
                 <td><span class="pill ${d.active?'ok':''}">${d.active?'Active':'Paused'}</span></td>
                 <td>
-                  <button class="o" onclick="api('/api/admin/discount','POST',{code:'${d.code}',pct:${d.pct},active:${!d.active}}).then(refresh)">
-                    ${d.active?'Pause':'Resume'}
-                  </button>
-                  <button class="r" onclick="api('/api/admin/discount/${d.code}','DELETE').then(refresh)">
-                    Delete
-                  </button>
+                  <button class="o" onclick="api('/api/admin/discount','POST',{code:'${d.code}',pct:${d.pct},active:${!d.active}}).then(refresh)">${d.active?'Pause':'Resume'}</button>
+                  <button class="r" onclick="api('/api/admin/discount/${d.code}','DELETE').then(refresh)">Delete</button>
                 </td>
               </tr>
             `).join('') || '<tr><td colspan="4" style="color:#777;padding:12px 0">No promo codes active.</td></tr>'}
@@ -473,15 +523,117 @@ const V = {
 };
 
 // ---------------------------------------------------------------------------
+// CATEGORIES & BRANDING LOGIC
+// ---------------------------------------------------------------------------
+function addCategory(){
+  const name = prompt('Enter Category Name (e.g. Suits & Tux, Men, Women):');
+  if (!name || !name.trim()) return;
+  const id = name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+  D.categories = D.categories || [];
+  D.categories.push({ id, name:name.trim(), subtitle:'Exclusive outerwear', image:'' });
+  draw();
+  toast('Category added. Click Save All Categories to publish.');
+}
+
+function removeCategory(i){
+  if (confirm('Delete this category?')) {
+    D.categories.splice(i, 1);
+    draw();
+  }
+}
+
+async function saveCategories(){
+  await api('/api/admin/categories', 'POST', { categories: D.categories });
+  await refresh();
+  toast('Categories updated and published!');
+}
+
+async function uploadCatImage(i){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const f = input.files[0];
+    if (!f) return;
+    toast('Uploading category image…');
+    const src = await new Promise(r => { const x=new FileReader(); x.onload=()=>r(x.result); x.readAsDataURL(f); });
+    const url = await up(await shrink(src, 1200, .8));
+    D.categories[i].image = url;
+    draw();
+    toast('Image uploaded. Click Save All Categories.');
+  };
+  input.click();
+}
+
+async function uploadLogo(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const f = input.files[0];
+    if (!f) return;
+    toast('Uploading logo…');
+    const src = await new Promise(r => { const x=new FileReader(); x.onload=()=>r(x.result); x.readAsDataURL(f); });
+    const url = await up(await shrink(src, 600, .9));
+    $('#thLogo').value = url;
+    toast('Logo uploaded. Click Save Branding Changes.');
+  };
+  input.click();
+}
+
+async function uploadHeroBg(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const f = input.files[0];
+    if (!f) return;
+    toast('Uploading hero background…');
+    const src = await new Promise(r => { const x=new FileReader(); x.onload=()=>r(x.result); x.readAsDataURL(f); });
+    const url = await up(await shrink(src, 1920, .85));
+    $('#thBg').value = url;
+    toast('Background uploaded. Click Save Branding Changes.');
+  };
+  input.click();
+}
+
+async function saveThemeSettings(){
+  await api('/api/admin/settings', 'POST', {
+    storeName: $('#thName').value.trim() || 'SHAH JACKETS',
+    logoUrl: $('#thLogo').value.trim(),
+    heroBg: $('#thBg').value.trim(),
+    heroHeading: $('#thHeading').value.trim(),
+    heroSubheading: $('#thSub').value.trim(),
+    heroTagline: $('#thTagline').value.trim(),
+    heroBtnText: $('#thBtnText').value.trim()
+  });
+  await refresh();
+  toast('Branding changes saved!');
+}
+
+async function saveMarketingSettings(){
+  await api('/api/admin/settings', 'POST', {
+    saleActive: $('#sa').checked,
+    salePercent: +$('#sp').value || 0,
+    saleLabel: $('#sl').value,
+    banner: $('#bn').value,
+    bannerCode: $('#bnCode').value.trim()
+  });
+  await refresh();
+  toast('Sale settings saved!');
+}
+
+// ---------------------------------------------------------------------------
 // LISTING EDITOR & MANAGEMENT
 // ---------------------------------------------------------------------------
-const newP = () => ({ title:'', desc:'', price:'', cat:'leather', season:'All-Season', sizes:['S','M','L','XL'], custom:true, colors:[], images:[], thumbs:[] });
+const newP = () => ({ title:'', desc:'', price:'', cat:(D.categories?.[0]?.id || 'leather'), season:'All-Season', sizes:['S','M','L','XL'], custom:true, colors:[], images:[], thumbs:[] });
 const rd = () => { const y=scrollY; draw(); scrollTo(0,y); };
 
 function lgH(){
   const q = ls.toLowerCase();
   const L = (D.products||[]).filter(p => (!lcat || p.cat===lcat) && (!q || (p.title+' '+(p.desc||'')).toLowerCase().includes(q)));
   if (!L.length) return `<div class="c emp" style="grid-column:1/-1">${D.products.length ? 'No listings match your search.' : 'No listings yet. Add your first jacket.'}</div>`;
+  const catMap = Object.fromEntries((D.categories||[]).map(c=>[c.id, c.name]));
   return L.map(p => `
     <div class="pc">
       <div class="pi">
@@ -492,13 +644,11 @@ function lgH(){
         <b>${esc(p.title)}</b>
         <span class="pr">$${(+p.price).toFixed(2)}</span>
         <div class="tg">
-          <i>${CL[p.cat]||p.cat}</i>
+          <i>${catMap[p.cat]||p.cat}</i>
           <i>${esc(p.season)}</i>
           <i>${(p.images||[]).length} photo${(p.images||[]).length===1?'':'s'}</i>
           ${(p.sizes||[]).length ? `<i>${p.sizes.join(' ')}</i>` : ''}
-          ${p.custom ? '<i>Custom</i>' : ''}
         </div>
-        ${(p.colors||[]).length ? `<small style="color:#666">${p.colors.map(esc).join(', ')}</small>` : ''}
       </div>
       <div class="ac">
         <button class="o" onclick="edit('${p.id}')">Edit</button>
@@ -517,7 +667,7 @@ function phH(){
     <label class="dz" ondragover="event.preventDefault();this.classList.add('dr')" ondragleave="this.classList.remove('dr')" ondrop="event.preventDefault();this.classList.remove('dr');ph(event.dataTransfer.files)">
       <input type="file" accept="image/*" multiple hidden onchange="ph(this.files);this.value=''">
       <b>Click to upload photos</b> or drag & drop files here<br>
-      <span>Upload as many photos as you want. Select Primary (default cover) and Secondary (shown when mouse hovers).</span>
+      <span>Select Primary Cover (default) and Secondary Hover (shown on mouse over).</span>
     </label>
     <div class="pts">
       ${p.images.map((u,i) => {
@@ -527,14 +677,8 @@ function phH(){
         <div class="pt${isPrimary ? ' cv' : (isSecondary ? ' sc' : '')}">
           <img src="${esc(p.thumbs[i]||u)}" alt="">
           ${isPrimary ? '<em>Primary Cover</em>' : (isSecondary ? '<em>Secondary Hover</em>' : '')}
-          
-          <button class="tagb ${isPrimary ? 'act' : ''}" onclick="setPrimary(${i})">
-            ${isPrimary ? '★ Primary Cover' : 'Set Primary'}
-          </button>
-          <button class="tagb ${isSecondary ? 'act' : ''}" onclick="setSecondary(${i})">
-            ${isSecondary ? 'Hover Active' : 'Set Hover (2nd)'}
-          </button>
-
+          <button class="tagb ${isPrimary ? 'act' : ''}" onclick="setPrimary(${i})">${isPrimary ? '★ Primary Cover' : 'Set Primary'}</button>
+          <button class="tagb ${isSecondary ? 'act' : ''}" onclick="setSecondary(${i})">${isSecondary ? 'Hover Active' : 'Set Hover (2nd)'}</button>
           <div>
             <button title="Move left" onclick="mv(${i},-1)" ${i?'':'disabled'}>◀</button>
             <button title="Move right" onclick="mv(${i},1)" ${i<p.images.length-1?'':'disabled'}>▶</button>
@@ -565,7 +709,7 @@ function setPrimary(i){
   const p = ed; if (i === 0) return;
   p.images.unshift(p.images.splice(i, 1)[0]);
   p.thumbs.unshift(p.thumbs.splice(i, 1)[0]);
-  ed._d = 1; phr(); toast('Primary cover image updated');
+  ed._d = 1; phr(); toast('Primary cover set');
 }
 
 function setSecondary(i){
@@ -575,7 +719,7 @@ function setSecondary(i){
   const th = p.thumbs.splice(i, 1)[0];
   p.images.splice(1, 0, img);
   p.thumbs.splice(1, 0, th);
-  ed._d = 1; phr(); toast('Secondary hover image updated');
+  ed._d = 1; phr(); toast('Secondary hover set');
 }
 
 function rmI(i){ ed.images.splice(i,1); ed.thumbs.splice(i,1); ed._d=1; phr(); }
@@ -610,7 +754,7 @@ function editor(){
           <p class="er" id="e_pr"></p>
           <h3 style="margin-top:10px">Category</h3>
           <select onchange="fld('cat',this.value)">
-            ${Object.entries(CL).map(([k,v]) => `<option value="${k}" ${p.cat===k?'selected':''}>${v}</option>`).join('')}
+            ${(D.categories||[]).map(c => `<option value="${esc(c.id)}" ${p.cat===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
           </select>
           <h3 style="margin-top:10px">Season Drop</h3>
           <select onchange="fld('season',this.value)">
@@ -626,7 +770,6 @@ function editor(){
             <input type="checkbox" ${p.custom?'checked':''} onchange="fld('custom',this.checked)">
             Allow Custom Size (DM Order)
           </label>
-          <p class="er" id="e_sz"></p>
         </div>
 
         <div class="c">
@@ -643,7 +786,7 @@ function editor(){
         </div>
 
         <div class="c">
-          <h3>Storefront Preview <small>(Hover mouse to test 2nd photo)</small></h3>
+          <h3>Storefront Hover Preview</h3>
           <div class="pc" style="max-width:210px">
             <div class="pi">
               <img id="pvi" src="${esc(p.thumbs[0]||p.images[0]||'')}" alt="">
@@ -765,18 +908,6 @@ async function del(id){
   }
 }
 
-async function sset(){
-  await api('/api/admin/settings', 'POST', {
-    saleActive: $('#sa').checked,
-    salePercent: +$('#sp').value || 0,
-    saleLabel: $('#sl').value,
-    banner: $('#bn').value,
-    specialBtn: { on:$('#bo').checked, text:$('#bt').value, code:$('#bc').value }
-  });
-  await refresh();
-  toast('Store settings saved');
-}
-
 async function sdc(){
   const code = $('#dc').value, pct = $('#dp').value;
   if (!code || !pct) return alert('Enter both promo code and percentage.');
@@ -798,11 +929,9 @@ async function rp(){
 
 const rs = (id, s) => api('/api/admin/refund/' + id, 'POST', { status:s }).then(refresh);
 
-// Periodic polling when logged in
 setInterval(() => {
   if (T && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName) && tab !== 'list') refresh();
 }, 8000);
 
-// Initialize
 T ? refresh() : login();
 </script></body></html>

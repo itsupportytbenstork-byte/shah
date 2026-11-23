@@ -155,13 +155,15 @@ const rate = (d, c) => {
   return x ? x.pct / 100 : 0;
 };
 
+const E = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 // Clean Order Receipt Email for Customer
 function orderReceiptHtml(order) {
   const itemsHtml = order.items.map(i => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #eee;">
-        <strong>${i.title}</strong><br>
-        <span style="color:#777;font-size:13px;">Size: ${i.size} | Color: ${i.color}</span>
+        <strong>${E(i.title)}</strong><br>
+        <span style="color:#777;font-size:13px;">Size: ${E(i.size)} | Color: ${E(i.color)}</span>
       </td>
       <td style="padding:10px 0;text-align:center;border-bottom:1px solid #eee;">x${i.qty}</td>
       <td style="padding:10px 0;text-align:right;border-bottom:1px solid #eee;">$${(i.price * i.qty).toFixed(2)}</td>
@@ -196,26 +198,17 @@ function orderReceiptHtml(order) {
 
     <div style="background:#f9f9f9;padding:14px;border-radius:6px;font-size:13px;color:#444;">
       <p style="margin:0 0 6px 0;font-weight:bold;">Shipping to:</p>
-      ${order.address.name}<br>
-      ${order.address.street} ${order.address.apt || ''}<br>
-      ${order.address.city}, ${order.address.state} ${order.address.zip}<br>
-      ${order.address.country}<br>
-      Phone: ${order.address.phone}
+      ${E(order.address.name)}<br>
+      ${E(order.address.street)} ${E(order.address.apt || '')}<br>
+      ${E(order.address.city)}, ${E(order.address.state)} ${E(order.address.zip)}<br>
+      ${E(order.address.country)}<br>
+      Phone: ${E(order.address.phone)}
     </div>
   </div>`;
 }
 
-function refundHtml(refund) {
-  return `
-  <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:auto;padding:24px;border:1px solid #e4e1dc;border-radius:8px;color:#141414;">
-    <h1 style="font-family:Georgia,serif;letter-spacing:0.1em;margin-top:0;font-size:24px;">SHAH JACKETS</h1>
-    <h2 style="font-size:18px;margin-bottom:8px;">Refund Request Received (${refund.id})</h2>
-    <p style="color:#555;">We have received your 7-day refund request for order <strong>#${refund.orderId}</strong>.</p>
-    <div style="background:#f9f9f9;padding:14px;border-radius:6px;margin:16px 0;font-size:13px;">
-      <strong>Reason:</strong> ${refund.reason}
-    </div>
-  </div>`;
-}
+// Emails are sent ONLY for: order confirmation, cart reminder (and the 6-digit verification code needed at checkout).
+// Refunds are handled in the admin Refunds section and never email anyone.
 
 async function sendMail(to, subject, html) {
   try {
@@ -236,7 +229,7 @@ const cartKey = e => crypto.createHash('sha1').update(e).digest('hex').slice(0, 
 
 const shell = body => `<div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:auto;padding:24px;border:1px solid #e4e1dc;border-radius:8px;color:#141414;"><h1 style="font-family:Georgia,serif;letter-spacing:0.1em;margin-top:0;font-size:24px;">SHAH JACKETS</h1>${body}</div>`;
 const codeHtml = c => shell(`<h2 style="font-size:18px;">Verify your email</h2><p style="color:#555;">Enter this code at checkout. It expires in 10 minutes.</p><p style="font-size:32px;letter-spacing:8px;font-weight:bold;margin:16px 0;">${c}</p><p style="color:#888;font-size:12px;">If you did not request this, you can ignore this email.</p>`);
-const cartHtml = rows => shell(`<h2 style="font-size:18px;margin-bottom:8px;">You left something in your cart</h2><p style="color:#555;">Your jackets are still waiting for you.</p><table style="width:100%;border-collapse:collapse;margin:16px 0;">${rows.map(({ p, i, price }) => `<tr><td style="padding:10px 0;border-bottom:1px solid #eee;"><strong>${p.title}</strong><br><span style="color:#777;font-size:13px;">Size: ${i.size} | Color: ${i.color}</span></td><td style="padding:10px 0;text-align:center;border-bottom:1px solid #eee;">x${i.qty}</td><td style="padding:10px 0;text-align:right;border-bottom:1px solid #eee;">$${(price * i.qty).toFixed(2)}</td></tr>`).join('')}</table><p><a href="${SHOP_URL}" style="display:inline-block;background:#141414;color:#fff;padding:12px 24px;text-decoration:none;border-radius:4px;">Complete your order</a></p><p style="color:#888;font-size:12px;">Free shipping on all orders | 7-day hassle-free returns</p>`);
+const cartHtml = rows => shell(`<h2 style="font-size:18px;margin-bottom:8px;">You left something in your cart</h2><p style="color:#555;">Your jackets are still waiting for you.</p><table style="width:100%;border-collapse:collapse;margin:16px 0;">${rows.map(({ p, i, price }) => `<tr><td style="padding:10px 0;border-bottom:1px solid #eee;"><strong>${E(p.title)}</strong><br><span style="color:#777;font-size:13px;">Size: ${E(i.size)} | Color: ${E(i.color)}</span></td><td style="padding:10px 0;text-align:center;border-bottom:1px solid #eee;">x${i.qty}</td><td style="padding:10px 0;text-align:right;border-bottom:1px solid #eee;">$${(price * i.qty).toFixed(2)}</td></tr>`).join('')}</table><p><a href="${SHOP_URL}" style="display:inline-block;background:#141414;color:#fff;padding:12px 24px;text-decoration:none;border-radius:4px;">Complete your order</a></p><p style="color:#888;font-size:12px;">Free shipping on all orders | 7-day hassle-free returns</p>`);
 
 async function sendReminders() {
   const d = await load();
@@ -256,8 +249,17 @@ async function sendReminders() {
 app.get('/api/data', wrap(async (q, s) => {
   const d = await load();
   s.set('Cache-Control', 'public, max-age=15, s-maxage=15');
-  s.json({ products: d.products, categories: d.categories || DEFAULT_CATEGORIES, settings: d.settings });
+  s.json({ products: d.products, categories: publicCategories(d), settings: d.settings });
 }));
+
+// Merge the categories list with the label/image overrides saved from the admin Categories page
+function publicCategories(d) {
+  const st = d.settings || {}, imgs = st.categoryImages || {};
+  const base = (Array.isArray(d.categories) && d.categories.length ? d.categories : DEFAULT_CATEGORIES);
+  const out = base.map(c => ({ id: c.id, name: (st.categories || {})[c.id] || c.name, subtitle: c.subtitle || '', image: imgs[c.id] || c.image || '' }));
+  Object.entries(st.categories || {}).forEach(([k, v]) => { if (!out.find(c => c.id === k)) out.push({ id: k, name: v, subtitle: '', image: imgs[k] || '' }); });
+  return out;
+}
 
 app.post('/api/promo', wrap(async (q, s) => {
   const r = rate(await load(), q.body.code);
@@ -297,9 +299,9 @@ app.post('/api/order', wrap(async (q, s) => {
   };
 
   d.orders.unshift(o);
+  // Await the email: on Vercel the function can be frozen right after the response, which silently dropped emails.
+  o.emailSent = await sendMail(b.address.email, `Order Confirmation #${o.id} - Shah Jackets`, orderReceiptHtml(o));
   await save(d);
-
-  sendMail(b.address.email, `Order Confirmation #${o.id} - Shah Jackets`, orderReceiptHtml(o));
   s.json({ ok: true, order: o });
 }));
 
@@ -332,12 +334,21 @@ app.post('/api/refund', wrap(async (q, s) => {
   if (!o) return s.status(404).json({ error: 'No order matches that ID and email.' });
   if (Date.now() - new Date(o.date) > 7 * 864e5) return s.status(400).json({ error: 'The 7-day refund window has passed.' });
 
-  const r = { id: id('RF-').toUpperCase(), orderId: o.id, email, reason, date: new Date().toISOString(), status: 'Requested' };
-  d.refunds.unshift(r);
-  await save(d);
+  if (d.refunds.some(x => x.orderId === o.id && ['Requested', 'Approved'].includes(x.status))) return s.status(400).json({ error: 'A refund request for this order is already open.' });
 
-  sendMail(email, `Refund Request Received #${r.id} - Shah Jackets`, refundHtml(r));
-  s.json({ ok: true });
+  const r = { id: id('RF-').toUpperCase(), orderId: o.id, email: o.address.email, reason: String(reason || '').slice(0, 1000), amount: o.total, date: new Date().toISOString(), status: 'Requested' };
+  d.refunds.unshift(r);
+  await save(d); // no email is sent for refunds; the owner handles them in the admin Refunds section
+  s.json({ ok: true, id: r.id });
+}));
+
+// Customer order tracking (order ID + email)
+app.post('/api/track', wrap(async (q, s) => {
+  const d = await load(), { orderId, email } = q.body;
+  const o = d.orders.find(x => x.id === String(orderId || '').trim().toUpperCase() && em(x.address.email) === em(email));
+  if (!o) return s.status(404).json({ error: 'No order matches that ID and email.' });
+  const rf = d.refunds.find(x => x.orderId === o.id);
+  s.json({ ok: true, order: { id: o.id, date: o.date, status: o.status, paid: o.paid, total: o.total, items: o.items.map(i => ({ title: i.title, size: i.size, color: i.color, qty: i.qty })) }, refund: rf ? { id: rf.id, status: rf.status } : null });
 }));
 
 app.get('/api/chat/:sid', wrap(async (q, s) => s.json((await load()).chats[sidOf(q)] || { messages: [] })));
@@ -415,7 +426,12 @@ app.post('/api/admin/order/:id', admin, wrap(async (q, s) => {
 
 app.post('/api/admin/refund/:id', admin, wrap(async (q, s) => {
   const d = await load(), r = d.refunds.find(x => x.id === q.params.id);
-  if (r) r.status = q.body.status;
+  if (r) {
+    r.status = q.body.status;
+    r.adminNotes = String(q.body.adminNotes || '').slice(0, 1000);
+    r.statusDate = new Date().toISOString();
+    if (r.status === 'Refunded') { const o = d.orders.find(x => x.id === r.orderId); if (o) o.refunded = true; }
+  }
   await save(d);
   s.json({ ok: true });
 }));

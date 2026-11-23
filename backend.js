@@ -409,9 +409,10 @@ app.delete('/api/admin/discount/:c', admin, wrap(async (q, s) => {
   s.json({ ok: true });
 }));
 
-app.get('/api/config', (q, s) => s.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || '' }));
+const GOOGLE_CLIENT_ID = '137888463657-a8hh021g8i4tg1ookc2kqna41tlb4n33.apps.googleusercontent.com';
+app.get('/api/config', (q, s) => s.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID }));
 app.post('/api/auth/google', wrap(async (q, s) => {
-  const cid = process.env.GOOGLE_CLIENT_ID;
+  const cid = process.env.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID;
   if (!cid) return s.status(503).json({ error: 'Google sign-in is not set up.' });
   const r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(String(q.body.credential || '')));
   const t = await r.json();

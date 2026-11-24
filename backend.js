@@ -50,12 +50,14 @@ const FROM = 'Shah Jackets <onboarding@resend.dev>';
 const SHOP_URL = 'https://shah-jackets.netlify.app';
 const REQUIRE_VERIFY = true; // customers must verify their email (6-digit code) before ordering
 
+// Safepay credentials
+const SAFEPAY_PUBLIC_KEY = '7c7a6a694fd1c0a696ebcc76e0f991de8b126758a94ec4017a45f73b59bf221b';
+const SAFEPAY_SECRET_KEY = 'c395a5fee448b58948a41c7d808fd789dd3854c97844143b6345edafa1b3736d';
+const SAFEPAY_ENDPOINT_KEY = 'sec_81b92ebd-57d2-4bdd-ab28-69a3122aa10a';
+
 // Default Categories with custom image and subtitle
 const DEFAULT_CATEGORIES = [
-  { id: 'leather', name: 'Leather & Bikers', subtitle: 'Full-grain, built to age', image: 'https://res.cloudinary.com/hined3dc/image/upload/f_auto,q_auto/1000014616' },
-  { id: 'wool', name: 'Wool & Tailored', subtitle: 'Merino overcoats', image: '' },
-  { id: 'street', name: 'Streetwear & Bombers', subtitle: 'Everyday statement pieces', image: '' },
-  { id: 'special', name: 'Special Drops', subtitle: 'Limited editions', image: '' }
+  { id: 'wool', name: 'Wool & Tailored', subtitle: 'Merino overcoats', image: '' }
 ];
 
 // Default Data Schema
@@ -249,7 +251,10 @@ async function sendReminders() {
 app.get('/api/data', wrap(async (q, s) => {
   const d = await load();
   s.set('Cache-Control', 'public, max-age=15, s-maxage=15');
-  s.json({ products: d.products, categories: publicCategories(d), settings: d.settings });
+  const sold = {};
+  d.orders.filter(o => o.status !== 'Cancelled' && !o.refunded).forEach(o => o.items.forEach(i => sold[i.id] = (sold[i.id] || 0) + i.qty));
+  const top = Object.keys(sold).filter(k => d.products.some(p => p.id === k)).sort((a, b) => sold[b] - sold[a]).slice(0, 8);
+  s.json({ products: d.products, categories: publicCategories(d), settings: d.settings, top });
 }));
 
 // Merge the categories list with the label/image overrides saved from the admin Categories page
@@ -293,7 +298,7 @@ app.post('/api/order', wrap(async (q, s) => {
     total: +(sub - disc).toFixed(2),
     currency: b.currency,
     address: b.address,
-    gateway: b.gateway || 'cod',
+    gateway: 'safepay',
     status: 'Pending',
     paid: false
   };
@@ -362,9 +367,7 @@ app.post('/api/chat/:sid', wrap(async (q, s) => {
 }));
 
 const gateways = {
-  cod: async () => ({ ok: true }),
-  stripe: async (o, q) => ({ error: 'Stripe is not activated.' }),
-  paypal: async () => ({ error: 'PayPal is not activated.' })
+  safepay: async () => ({ error: 'Online payment is not activated yet.' }) // Safepay keys go here
 };
 
 app.post('/api/pay/:g', wrap(async (q, s) => {

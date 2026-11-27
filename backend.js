@@ -11,7 +11,8 @@ const ORIGINS = [
   'https://shah-jackets.netlify.app',
   'https://gg-shah-admin.netlify.app',
   'https://shah-mdq2jc138-sh-ah-jac-kets.vercel.app',
-  'https://shah-fg0fojuh2-sh-ah-jac-kets.vercel.app'
+  'https://shah-fg0fojuh2-sh-ah-jac-kets.vercel.app',
+  'https://shah-2v0si0rke-sh-ah-jac-kets.vercel.app'
 ];
 app.use((q, s, n) => {
   if (ORIGINS.includes(q.headers.origin)) {
@@ -50,10 +51,13 @@ const FROM = 'Shah Jackets <onboarding@resend.dev>';
 const SHOP_URL = 'https://shah-jackets.netlify.app';
 const REQUIRE_VERIFY = true; // customers must verify their email (6-digit code) before ordering
 
-// Safepay credentials
-const SAFEPAY_PUBLIC_KEY = '7c7a6a694fd1c0a696ebcc76e0f991de8b126758a94ec4017a45f73b59bf221b';
+// Safepay credentials. Safepay's public API key starts with "sec_"; the two 64-character keys are the secret key and the webhook secret.
+const SAFEPAY_ENV = 'sandbox'; // change to 'production' to take real payments (keys are different per environment)
+const SAFEPAY_API_KEY = 'sec_81b92ebd-57d2-4bdd-ab28-69a3122aa10a';
 const SAFEPAY_SECRET_KEY = 'c395a5fee448b58948a41c7d808fd789dd3854c97844143b6345edafa1b3736d';
-const SAFEPAY_ENDPOINT_KEY = 'sec_81b92ebd-57d2-4bdd-ab28-69a3122aa10a';
+const SAFEPAY_WEBHOOK_SECRET = '7c7a6a694fd1c0a696ebcc76e0f991de8b126758a94ec4017a45f73b59bf221b';
+const SAFEPAY_HOST = SAFEPAY_ENV === 'production' ? 'https://api.getsafepay.com' : 'https://sandbox.api.getsafepay.com';
+// Store prices are in USD and customers are always charged in USD.
 
 // Default Categories with custom image and subtitle
 const DEFAULT_CATEGORIES = [
@@ -101,6 +105,12 @@ const fill = d => {
   };
   ['products', 'orders', 'refunds', 'discounts'].forEach(k => x[k] = A(x[k]));
   x.categories = Array.isArray(x.categories) && x.categories.length ? x.categories : DEFAULT_CATEGORIES;
+  if (!x.categoriesReset) { // one-time cleanup: keep only the Wool category (and its saved label/image), drop all others
+    const wool = x.categories.filter(c => c.id === 'wool');
+    x.categories = wool.length ? wool : DEFAULT_CATEGORIES;
+    ['categories', 'categoryImages'].forEach(k => { const m = x.settings[k]; if (m) x.settings[k] = m.wool !== undefined ? { wool: m.wool } : {}; });
+    x.categoriesReset = true;
+  }
   ['slides', 'tiles', 'reviews'].forEach(k => x.settings[k] = A(x.settings[k]));
   x.chats = x.chats || {};
   x.carts = x.carts || {};
@@ -304,9 +314,7 @@ app.post('/api/order', wrap(async (q, s) => {
   };
 
   d.orders.unshift(o);
-  // Await the email: on Vercel the function can be frozen right after the response, which silently dropped emails.
-  o.emailSent = await sendMail(b.address.email, `Order Confirmation #${o.id} - Shah Jackets`, orderReceiptHtml(o));
-  await save(d);
+  await save(d); // the confirmation email is sent once payment is confirmed
   s.json({ ok: true, order: o });
 }));
 
@@ -366,18 +374,64 @@ app.post('/api/chat/:sid', wrap(async (q, s) => {
   s.json({ ok: true });
 }));
 
-const gateways = {
-  safepay: async () => ({ error: 'Online payment is not activated yet.' }) // Safepay keys go here
+// Safepay hosted checkout: create tracker -> redirect customer -> verify tracker with Safepay when they return
+const spCall = async (path, method, body) => {
+  const r = await fetch(SAFEPAY_HOST + path, { method, headers: { 'Content-Type': 'application/json', 'X-SFPY-MERCHANT-SECRET': SAFEPAY_SECRET_KEY }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((j.status && j.status.message) || j.message || 'Safepay error ' + r.status);
+  return j;
 };
+const chargeAmount = usd => Math.round(usd * 100); // USD cents
+const orderFor = (d, q) => d.orders.find(x => x.id === String(q.body.orderId || '').trim().toUpperCase() && em(x.address.email) === em(q.body.email));
 
-app.post('/api/pay/:g', wrap(async (q, s) => {
-  const d = await load(), o = d.orders.find(x => x.id === q.body.orderId), g = gateways[q.params.g];
-  if (!o || !g) return s.status(400).json({ error: 'Bad request' });
-  s.json(await g(o, q));
+app.post('/api/pay/safepay', wrap(async (q, s) => {
+  const d = await load(), o = orderFor(d, q);
+  if (!o) return s.status(404).json({ error: 'Order not found.' });
+  if (o.paid) return s.json({ ok: true, paid: true });
+  const base = ORIGINS.includes(q.body.origin) ? q.body.origin : SHOP_URL;
+  const t = await spCall('/order/payments/v3/', 'POST', { merchant_api_key: SAFEPAY_API_KEY, intent: 'CYBERSOURCE', mode: 'payment', currency: 'USD', amount: chargeAmount(o.total), metadata: { order_id: o.id } });
+  const tracker = t.data && t.data.tracker && t.data.tracker.token;
+  if (!tracker) throw new Error('Safepay did not return a payment tracker.');
+  const tbt = (await spCall('/client/passport/v1/token', 'POST')).data;
+  const safepay = require('@sfpy/node-core')(SAFEPAY_SECRET_KEY, { authType: 'secret', host: SAFEPAY_HOST });
+  const url = safepay.checkouts.payment.create({ tracker, tbt, environment: SAFEPAY_ENV, source: 'hosted', redirect_url: `${base}/?pay=${o.id}`, cancel_url: `${base}/?cancel=${o.id}` });
+  o.tracker = tracker;
+  await save(d);
+  s.json({ ok: true, url });
+}));
+
+app.post('/api/pay/verify', wrap(async (q, s) => {
+  const d = await load(), o = orderFor(d, q);
+  if (!o) return s.status(404).json({ error: 'Order not found.' });
+  if (!o.paid && o.tracker) {
+    const r = await spCall('/reporter/api/v1/payments/' + encodeURIComponent(o.tracker), 'GET');
+    if (r.data && r.data.tracker && r.data.tracker.state === 'TRACKER_ENDED') {
+      o.paid = true;
+      o.paidAt = new Date().toISOString();
+      o.emailSent = await sendMail(o.address.email, `Order Confirmation #${o.id} - Shah Jackets`, orderReceiptHtml(o));
+      await save(d);
+    }
+  }
+  s.json({ ok: true, paid: !!o.paid, id: o.id, emailSent: o.emailSent });
 }));
 
 // Admin Routes - Login ONLY checks password === 'HAZIQALI'
 app.post('/api/admin/login', (q, s) => q.body.password === PW ? s.json({ ok: true }) : s.status(401).json({ error: 'Wrong password' }));
+// Live USD->PKR rate for the admin dashboard only (never used for customer prices). Cached 1 hour; on failure the last good rate is returned flagged stale.
+let fx = null;
+async function liveFx() {
+  if (fx && Date.now() - fx.fetched < 36e5) return { usdPkr: fx.usdPkr, updated: fx.updated, stale: false };
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(8000) });
+    const j = await r.json(), v = j && j.rates && +j.rates.PKR;
+    if (!r.ok || j.result !== 'success' || !(v > 0)) throw new Error('bad rate response');
+    fx = { usdPkr: v, updated: j.time_last_update_utc ? new Date(j.time_last_update_utc).toISOString() : new Date().toISOString(), fetched: Date.now() };
+    return { usdPkr: fx.usdPkr, updated: fx.updated, stale: false };
+  } catch (e) {
+    return fx ? { usdPkr: fx.usdPkr, updated: fx.updated, stale: true } : { usdPkr: null, stale: true, error: 'Live exchange rate is unavailable right now.' };
+  }
+}
+app.get('/api/admin/fx', admin, wrap(async (q, s) => s.json(await liveFx())));
 app.get('/api/admin/data', admin, wrap(async (q, s) => s.json({ ...(await load()), persistent: !!FB || !process.env.VERCEL })));
 
 // Cloudinary Direct Upload
